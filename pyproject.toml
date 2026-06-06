@@ -1,0 +1,14 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mcp-client-console"
+version = "0.0.1"
+description = "MCP client that connects to a remote MCP server"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.11"
+
+[project.urls]
+Homepage = "https://github.com/geomux/mcp-client-console"
