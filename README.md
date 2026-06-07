@@ -1,3 +1,3 @@
 # mcp-client-console
 
-Quickstart template for an MCP client that connects to a remote MCP server.
+MCP client that connects to a remote MCP server, LLM backend (API key or local model) and preset configuration files.
