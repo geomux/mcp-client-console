@@ -1,0 +1,30 @@
+# mcp-client-console configuration
+
+# --- SETUP BELOW ---
+### This default file was created on first package run.
+### Edit the values below, save, and run the package again to begin.
+
+# [[server]]
+# name = "name of remote machine"
+# url = "address to remote machine server"
+# token = "bearer token for remote machine server"
+
+[[server]]
+name = "Box_1"
+url = "http://127.0.0.1:9000/mcp"
+token = "paste your token here"
+
+[[server]]
+name = "Box_2"
+url = "http://127.0.0.1:9001/mcp"
+token = "paste your token here"
+
+[[server]]
+name = "Box_3"
+url = "http://127.0.0.1:9002/mcp"
+token = "paste your token here"
+
+### Add additional [[server]] names and urls as needed
+
+
+
