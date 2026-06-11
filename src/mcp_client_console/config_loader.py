@@ -51,17 +51,17 @@ def get_active_server(config_dictionary: dict) -> dict:
         active_server = input(f"\nConnect to a server. Enter number now: ")
         active_server = active_server.strip()
         server_number = int(active_server) - 1 # because Python indexes start at 0
-        if server_number < 0 or server_number >= len(servers):
+        if server_number < 0 or server_number >= len(available_servers):
             print("Enter a listed server number.")
             sys.exit(1)
-        return servers[server_number]
+        return available_servers[server_number]
 
 if __name__ == "__main__":
     config = config_load()
     server = get_active_server(config)
     print("_" * 50)
     print(f"Server Config Loaded.")
-    print(f"Active Server: {server['name']}, " @ ", {server['url']}")
+    print(f"Active Server: {server['name']} @ {server['url']}")
 
 
 
