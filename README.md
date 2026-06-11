@@ -9,7 +9,8 @@ MCP client that connects to a remote MCP server, LLM backend (API key or local m
 ## User Guide | Installation
 
 ### Users: install commands
-    pipx install mcp-client-console
+    :~$ pipx install mcp-client-console
+    :~$ mcp-client-console
     
 ### Developers: install commands
     git clone https://github.com/geomux/mcp-client-console.git
