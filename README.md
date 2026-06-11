@@ -21,9 +21,9 @@ MCP client that connects to a remote MCP server, LLM backend (API key or local m
 
 ## User Guide | Configuration
 
-First run creates a default config.toml file and prints the filepath.
+First run will create a default config.toml file and print the filepath to the config file.
 
-Edit the config file, populate with server name and url. 
+Navigate to the filepath, edit the config file- populate with server name, url, token. 
 
 *The client reads from "config.toml" to locate and access remote MCP server.*
 
