@@ -2,7 +2,7 @@
 
 MCP client that connects to a remote MCP server, LLM backend (API key or local model) and preset configuration files.
 
-## Architecture Flowchart
+## System Architecture Flowchart
 
 {user} <--> mcp-client-console <--> HTTPS <--> {box} <--> mcp-server-remote <--> tools
 
@@ -20,7 +20,9 @@ MCP client that connects to a remote MCP server, LLM backend (API key or local m
 
 ## User Guide | Configuration
 
-Populate the "config.toml" file, located in the project root. 
+First run creates a default config.toml file and prints the filepath.
+
+Edit the config file, populate with server name and url. 
 
 *The client reads from "config.toml" to locate and access remote MCP server.*
 
@@ -30,6 +32,12 @@ EXAMPLE:
 name = "Box_1"
 url = "http://127.0.0.1:9000/mcp"
 ```
+### OS Config Filepath
+Linux: ~/.config/mcp-client-console/config.toml
+macOS: ~/Library/Application Support/mcp-client-console/config.toml
+Windows: %LOCALAPPDATA%\mcp-client-console\config.toml
+
+/config command may be used to print filepath within the termianl chat.
 
     
 ## User Guide | Operation
