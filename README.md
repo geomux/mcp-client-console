@@ -4,8 +4,11 @@ MCP client that connects to a remote MCP server, LLM backend (API key or local m
 
 ## Remote MCP System Architecture Flowchart
 
-{user} <--> mcp-client-console <--> HTTPS <--> {box} <--> mcp-server-remote <--> tools
+{user} <--> mcp-client-console <--> network <--> {box} <--> mcp-server-remote <--> tools
 
+## mcp-client-console Architecture Flowchart
+
+{user} <--> cli.py <--> client.py <--> mcp SDK <--> mcp-server-remote
 
 ## User Guide | Installation
 
