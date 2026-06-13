@@ -9,13 +9,13 @@ from platformdirs import user_config_dir
 
 APP_NAME = "mcp-client-console"
 
-### Defines Config File destination filepath
+### Defines destination filepath for Config File
 def config_path() -> Path:
     folder = Path(user_config_dir(APP_NAME, appauthor=False)) # appauthor=False stops Windows from adding an extra folder.
     file = folder / "config.toml"
     return file
 
-### Creates Config File if does not exist
+### Creates Config File (from template) if does not exist
 def config_create() -> Path:
     config_file = config_path()
     if not config_file.exists():
@@ -29,14 +29,14 @@ def config_create() -> Path:
         sys.exit(1)
     return config_file
 
-### Load Config File settings into Python dictionary
+### Load settings from Config File into Python dictionary
 def config_load() -> dict:
     config_file = config_create()
     with open(config_file, "rb") as f: # note that tomllib needs to read in binary, hence "rb"
         config_dictionary = tomllib.load(f)
     return config_dictionary
 
-### User chooses an active server from the Config File
+### User chooses an active server from Config File
 def get_active_server(config_dictionary: dict) -> dict:
     available_servers = config_dictionary["server"]
     if len(available_servers) == 1:
