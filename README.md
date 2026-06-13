@@ -2,9 +2,10 @@
 
 MCP client that connects to a remote MCP server, LLM backend (API key or local model) and preset configuration files.
 
-## System Architecture Flowchart
+## Remote MCP System Architecture Flowchart
 
 {user} <--> mcp-client-console <--> HTTPS <--> {box} <--> mcp-server-remote <--> tools
+
 
 ## User Guide | Installation
 
