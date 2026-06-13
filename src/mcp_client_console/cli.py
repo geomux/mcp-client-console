@@ -18,8 +18,10 @@ async def async_main(server: dict):
         for i, description in tools:
             print(f" Name: {i}\nDescription:{description}")
         print("_" * 50)
+        ### ---
         ### Section below to be replaced with LLM connections
         ### Section below temporary hardcoded to run a test get_time() tool via MCP
+        ### ---
         result = await run_tool(session, "get_time", {})
         print(f"\nget_time MCP tool says: {result}")
 
