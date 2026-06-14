@@ -15,8 +15,8 @@ async def async_main(server: dict):
         print("_" * 50)
         print(f"\nConnected: {server['name']} @ {server['url']}")
         print(f"\nAvailable Tools:")
-        for i, description in tools:
-            print(f" Name: {i}\nDescription:{description}")
+        for name, description, _ in tools: # "_" here is for the currently unused inputSchema attribute
+            print(f" Name: {name}\nDescription:{description}")
         print("_" * 50)
         ### ---
         ### Section below to be replaced with LLM connections
