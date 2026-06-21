@@ -2,6 +2,8 @@
 # User interface, load config, connect to active server, get tools via MCP with LLM
 
 import asyncio
+import httpx
+import sys
 from mcp_client_console.config_loader import config_load
 from mcp_client_console.config_loader import get_active_server
 from mcp_client_console.client import open_session
@@ -29,7 +31,14 @@ async def async_main(server: dict):
 def main():
     config_file = config_load()
     server = get_active_server(config_file)
-    asyncio.run(async_main(server))
+    try:
+        asyncio.run(async_main(server))
+    except* httpx.ConnectError: # error handling (unique situation here since its for async process)
+        print("_" * 50)
+        print(f"\nERROR: Could not reach {server['name']} at {server['url']}.")
+        print("\nIs the server running?\n")
+        print("_" * 50)
+
 
 if __name__ == "__main__":
     main()
