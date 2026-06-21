@@ -4,7 +4,7 @@
 ### This default file was created on first package run.
 ### Edit the values below, save, and run the package again to begin.
 
-# [[server]]
+# [[server]] EXAMPLE
 # name = "name of remote machine"
 # url = "address to remote machine server"
 # token = "bearer token for remote machine server"
