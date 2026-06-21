@@ -26,7 +26,7 @@ def config_create() -> Path:
         config_file.chmod(0o600) # owner access only, security concerns as token lives in this file
         print("_"*50)
         print("\n[ CONFIG CREATED ]")
-        print(f"{config_file}")
+        print(f"\n{config_file}")
         print(f"\nEdit the values, save, and run the package again to begin.")
         print("_"*50)
         sys.exit(1)
@@ -35,8 +35,8 @@ def config_create() -> Path:
 ### Load settings from Config File into Python dictionary
 def config_load() -> dict:
     config_file = config_create()
-    with open(config_file, "rb") as f: # note that tomllib needs to read in binary, hence "rb"
-        config_dictionary = tomllib.load(f)
+    config_text = config_file.read_text(encoding="utf-8-sig")
+    config_dictionary = tomllib.loads(config_text)
     return config_dictionary
 
 ### User chooses an active server from Config File
