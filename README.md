@@ -17,11 +17,12 @@ MCP client that connects to a remote MCP server, LLM backend (API key or local m
     :~$ mcp-client-console
     
 ### Developers: install commands
-    git clone https://github.com/geomux/mcp-client-console.git
-    cd mcp-client-console
-    python3 -m venv .venv
-    source .venv/bin/activate
-    pip install -e .
+    :~$ git clone https://github.com/geomux/mcp-client-console.git
+    :~$ cd mcp-client-console
+    :~$ python3 -m venv .venv
+    :~$ source .venv/bin/activate
+    :~$ pip install -e .
+    :~$ mcp-client-console
 
 ## User Guide | Configuration
 
