@@ -47,11 +47,13 @@ def get_active_server(config_dictionary: dict) -> dict:
         return active_server
     else:
         print("_" * 50)
-        print(f"\nMultiple Servers Available: ")
+        print(f"\n[ AVAILABLE SERVERS ]\n")
         for i, server in enumerate(available_servers, start=1):
-            print(f"{i}. {server['name']} @ {server['url']}")
+            print(f"[ {i} ] {server['name']} @ {server['url']}")
         print("_" * 50)
-        active_server = input(f"\nConnect to a server. Enter number now: ")
+        print(f"\nTo connect to a server, enter number below... ")
+        active_server = input(f">: ")
+        print("_" * 50)
         active_server = active_server.strip()
         server_number = int(active_server) - 1 # because Python indexes start at 0
         if server_number < 0 or server_number >= len(available_servers):
