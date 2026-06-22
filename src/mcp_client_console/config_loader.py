@@ -9,6 +9,21 @@ from platformdirs import user_config_dir
 
 APP_NAME = "mcp-client-console"
 
+
+### -------
+### CLI GUI
+### -------
+RESET = "\033[0m"
+BOLD_RED = "\033[1;31m"
+
+def error_text(text: str) -> str:
+    """Styles passed string to fancy error text formatting"""
+    return f"\n{BOLD_RED}ERROR: {text}{RESET}"
+
+
+### ----------
+### MAIN LOGIC
+### ----------
 def config_path() -> Path:
     """Defines destination filepath for Config File"""
     folder = Path(user_config_dir(APP_NAME, appauthor=False)) # appauthor=False stops Windows from adding an extra folder.
@@ -57,11 +72,11 @@ def get_active_server(config_dictionary: dict) -> dict:
         for i, server in enumerate(available_servers, start=1):
             print(f"[ {i} ] {server['name']} @ {server['url']}")
         print("_" * 50)
-        print(f"\nTo connect to a server, enter number below... ")
+        print("\nTo connect to a server, enter number below... ")
         server_choice = input(f">: ").strip()
         print("_" * 50)
         if server_choice.isdigit() == False:
-            print(f"\nEnter a server number listed above.")
+            print(error_text("\nEnter a server number listed above."))
             continue
 
         server_number = int(server_choice) - 1 # because Python indexes start at 0
