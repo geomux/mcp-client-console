@@ -79,7 +79,7 @@ How may I help you today?
 ## Project Status
 ## --
 - [x] Create MCP client repo
-- [ ] Connect to MCP server locally
+- [x] Connect to MCP server locally
 - [ ] LLM backend (API / local Ollama) added to client
 - [ ] Connect to MCP server remotely with TLS + bearer auth
 
