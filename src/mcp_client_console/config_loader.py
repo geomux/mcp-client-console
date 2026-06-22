@@ -28,7 +28,7 @@ def config_create() -> Path:
         config_file.chmod(0o600) # owner access only, security concerns as token lives in this file
         print("_"*50)
         print("\n[ CONFIG CREATED ]")
-        print"\nfilepath:"
+        print("\nfilepath:")
         print(f"\n{config_file}")
         print(f"\nOpen config file, review and edit accordingly, save, and run the package again to begin.")
         print("_"*50)
