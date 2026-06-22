@@ -10,24 +10,63 @@ from mcp_client_console.client import open_session
 from mcp_client_console.client import get_tools
 from mcp_client_console.client import run_tool
 
+### -------
+### CLI GUI
+### -------
+RESET = "\033[0m"
+BOLD_GREEN = "\033[1;32m"
+BOLD_BLUE = "\033[1;34m"
+BOLD_RED = "\033[1;31m"
+BRIGHT_MAGENTA = "\033[95m"
+
+PROMPT_KEY = f"{BOLD_GREEN}>: {RESET}" # colorful UI settings for console chat prompt key.
+def header_text(text: str) -> str:
+    """Styles passed string to fancy header formatting"""
+    return f"{BOLD_BLUE}{text}{RESET}"
+
+def model_text(text: str) -> str:
+    """Styles passed string to fancy model text formatting"""
+    return f"\n{BRIGHT_MAGENTA}MODEL: {text}{RESET}"
+
+def subheader_text(text: str) -> str:
+    return f"{BOLD_GREEN}{text}{RESET}"
+
+def error_text(text: str) -> str:
+    """Styles passed string to fancy error text formatting"""
+    return f"\n{BOLD_RED}ERROR: {text}{RESET}"
+
+
+
+
+
+### ----------
+### MAIN LOGIC
+### ----------
+
 ### Async'd logic | holds a session with the server and remote tool handling
 async def async_main(server: dict):
     async with open_session(server["url"]) as session:
         tools = await get_tools(session)
+        print(f"\n"*3)
+        print(subheader_text("...session begin...hello..."))
+        print(f"\n"*3)
         print("_" * 50)
-        print(f"\n[ CONNECTED ]")
+        print(header_text("[ CONNECTED SERVER ]"))
         print(f"\n{server['name']} @ {server['url']}\n")
         print("_" * 50)
-        print(f"\n[ AVAILABLE TOOLS]")
+        print(header_text("[ AVAILABLE TOOLS ]"))
         for name, description, _ in tools: # "_" here is for the currently unused inputSchema attribute
             print(f"\nName: {name}\nDescription:{description}")
         print("_" * 50)
-        print(f"\nEnter 'quit' or 'exit' to disconnect from server")
+        print(f"\nEnter 'quit' or 'exit' to disconnect from server at anytime.")
+        print("\nType below to access remote MCP server with agentic model...")
         connection_status = True
         while connection_status == True:
-            user_input = input(">: ").strip()
+            print("_" * 50)
+            print(model_text("How may I help you today?"))
+            user_input = input(f"\n{PROMPT_KEY} ").strip()
             if user_input.lower() == "quit" or user_input.lower() == "exit":
-                print(f"Disconnecting from {server['name']}...")
+                print(f"\nDisconnecting from {server['name']}...")
                 connection_status = False
             if not user_input:
                 continue
@@ -46,13 +85,12 @@ def main():
     while connection_status == True:
         server = get_active_server(config_file)
         try:
-            print("...session begin...hello...")
             asyncio.run(async_main(server))
-            print("...session over...goodbye...")
+            print(subheader_text("\n...session over...goodbye...\n"))
             connection_status = False
         except* httpx.ConnectError: # error handling (unique situation here since its for async process)
             print("_" * 50)
-            print(f"\nERROR: Could not reach {server['name']} at {server['url']}.")
+            print(error_text(f"\nCould not reach {server['name']} at {server['url']}."))
             print("\nIs the server running?\n")
             print("_" * 50)
 
