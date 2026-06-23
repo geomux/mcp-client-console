@@ -13,6 +13,6 @@ __all__ = [
     "ProviderReply",
     "ToolCall",
     "ToolResult",
-    "build_provider"
+    "build_provider",
     "Orchestrator",
     ]
