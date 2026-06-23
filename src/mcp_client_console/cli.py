@@ -3,7 +3,6 @@
 
 import asyncio
 import httpx
-import sys
 from mcp_client_console.config_loader import config_load
 from mcp_client_console.config_loader import get_active_server
 from mcp_client_console.client import open_session
@@ -18,6 +17,7 @@ BOLD_GREEN = "\033[1;32m"
 BOLD_BLUE = "\033[1;34m"
 BOLD_RED = "\033[1;31m"
 BRIGHT_MAGENTA = "\033[95m"
+DIM = "\033[2m"
 
 PROMPT_KEY = f"{BOLD_GREEN}>: {RESET}" # colorful UI settings for console chat prompt key.
 def header_text(text: str) -> str:
@@ -34,6 +34,10 @@ def subheader_text(text: str) -> str:
 def error_text(text: str) -> str:
     """Styles passed string to fancy error text formatting"""
     return f"\n{BOLD_RED}ERROR: {text}{RESET}"
+
+def tool_text(text: str) -> str:
+    """Styles text showing off a tool the model is running"""
+    return f"{DIM} -> {text}{RESET}"
 
 
 
@@ -60,6 +64,12 @@ async def async_main(server: dict):
         print("_" * 50)
         print(f"\nEnter 'quit' or 'exit' to disconnect from server at anytime.")
         print("\nType below to access remote MCP server with agentic model...")
+
+        def show_tool(name, args):
+            """Show text from running tool to see model agent working"""
+            print(tool_text(f"running tool: {name}, {args}"))
+
+
         connection_status = True
         while connection_status == True:
             print("_" * 50)
@@ -68,15 +78,16 @@ async def async_main(server: dict):
             if user_input.lower() == "quit" or user_input.lower() == "exit":
                 print(f"\nDisconnecting from {server['name']}...")
                 connection_status = False
+                continue
             if not user_input:
                 continue
 
-        ### ---
-        ### Section below to be replaced with LLM connections
-        ### Section below temporary hardcoded to run a test get_time() tool via MCP
-        ### ---
-        result = await run_tool(session, "get_time", {})
-        print(f"\n[ NO LLM YET ] result of get_time() is: {result}")
+        try:
+            reply = await orchestrator.run_turn(user_input, on_tool=show_tool)
+            print(model_text(reply))
+        except: httpx.ConnectError
+            print(error_text("Cannot reach the model.\nIs the local Ollama server running or API key configured?"))
+
 
 ### Sync'd logic | identifies config dictionary, gets the active server, runs async_main() to hold session with server
 def main():
@@ -85,7 +96,7 @@ def main():
     while connection_status == True:
         server = get_active_server(config_file)
         try:
-            asyncio.run(async_main(server))
+            asyncio.run(async_main(config_file, server))
             print(subheader_text("\n...session over...goodbye...\n"))
             connection_status = False
         except* httpx.ConnectError: # error handling (unique situation here since its for async process)
