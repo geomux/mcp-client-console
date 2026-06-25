@@ -1,13 +1,14 @@
 # mcp-client-console
 
 MCP client that connects to a remote MCP server, LLM backend (API key or local model) and preset configuration files.
-*Intented for use within private network for Cybersecurity purposes*
 
-## Remote MCP System Architecture Flowchart
+*Intented for use within private network for Cybersecurity purposes.*
+
+### Remote MCP System Architecture Flowchart
 
 {user} <--> mcp-client-console <--> network <--> {box} <--> mcp-server-remote <--> tools
 
-## mcp-client-console Architecture Flowchart
+### mcp-client-console Architecture Flowchart
 
 {user} <--> cli.py <--> client.py <--> mcp SDK <--> * <--> mcp-server-remote
 
