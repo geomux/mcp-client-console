@@ -71,7 +71,7 @@ def build_provider(config: dict, tools: list, prompt: str) -> Provider:
     prompt: default system prompt for the model to be activated with
     """
     llm_config = config.get("llm", {})
-    provider_name = llm_config.get("provider", "local") # local is default model provider
+    provider_name = llm_config.get("provider", None) # local is default model provider
 
     if provider_name == "local":
         from mcp_client_console.llm.provider_local import LocalProvider
