@@ -50,8 +50,8 @@ class ProviderReply:
 class Provider(ABC):
     """ Holds a stateful conversation with the LLM."""
     @abstractmethod
-    async def send_message(self, text: str) -> ProviderReply:
-        """Append a user message, call the model, return its reply"""
+    async def user_message(self, text: str) -> ProviderReply:
+        """ Append user's message to the conversation with the local model."""
         print(f"send_message called with: {text}")
 
     @abstractmethod
