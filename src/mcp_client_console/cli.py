@@ -4,6 +4,7 @@
 import asyncio
 import httpx
 import os
+from mcp_client_console.llm.orchestrator import Orchestrator
 from mcp_client_console.config_loader import config_load
 from mcp_client_console.config_loader import get_active_server
 from mcp_client_console.client import open_session
@@ -27,9 +28,10 @@ from mcp_client_console.terminal import (
 ### ----------
 
 ### Async'd logic | holds a session with the server and remote tool handling
-async def async_main(server: dict):
+async def async_main(server: dict, config: dict):
     async with open_session(server["url"]) as session:
         tools = await get_tools(session)
+        orchestrator = Orchestrator(session, config, tools)
         clear_terminal()
         print(welcome_banner())
         print("_" * 50)
@@ -64,6 +66,8 @@ async def async_main(server: dict):
             except httpx.ConnectError:
                 print(error_text("Cannot reach the model.\nIs the local Ollama server running or API key configured?"))
 
+        reply = await orchestrator.run_turn(user_input, on_tool=show_tool)
+
 
 ### Sync'd logic | identifies config dictionary, gets the active server, runs async_main() to hold session with server
 def main():
@@ -72,7 +76,7 @@ def main():
     while connection_status == True:
         server = get_active_server(config_file)
         try:
-            asyncio.run(async_main(server))
+            asyncio.run(async_main(server, config_file))
             connection_status = False
         except* httpx.ConnectError: # error handling (unique situation here since its for async process)
             print(error_text(f"\nCould not reach {server['name']} at {server['url']}.\n"))
