@@ -16,6 +16,7 @@ BOLD_GREEN = "\033[1;32m"
 BOLD_BLUE = "\033[1;34m"
 BOLD_RED = "\033[1;31m"
 BRIGHT_MAGENTA = "\033[95m"
+BOLD_YELLOW = "\033[1;33m"
 DIM = "\033[2m"
 
 THINKING_FRAMES = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
@@ -50,6 +51,14 @@ def tool_text(text: str) -> str:
 def italic_text(text: str) -> str:
     """Styles passed string to a fancy italic formatting"""
     return f"{ITALIC}{text}{RESET}"
+
+def authorize_text(name: str, args) -> str:
+    """Styles text prior to authorizing something serious in the terminal"""
+    return (
+        f"{BOLD_YELLOW}[ AUTHORIZE TOOL ACCESS ]{RESET}\n"
+        f"The model is asking to run a tool on the remote machine: {BOLD_BLUE}{name}{RESET} {DIM}{args}{RESET}\n"
+        f"Allow tool access for this session? {BOLD_GREEN}[y/n]{RESET}"
+    )
 
 
 
