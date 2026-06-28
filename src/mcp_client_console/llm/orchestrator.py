@@ -43,7 +43,7 @@ class Orchestrator:
         user_input: this argument passes the prompt from user.
         on_tool: this argument passes the tool chosen run (be switched on)
         """
-        reply = await self.provider.send_user(user_input)
+        reply = await self.provider.user_message(user_input)
 
         steps = 0
         while reply.wants_tools:
