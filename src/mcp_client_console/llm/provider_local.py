@@ -75,6 +75,10 @@ class LocalProvider(Provider):
                 "messages": self.messages,
                 "tools": self.tools,
                 "stream": False,
+                "options": {
+                  "temperature": 0 # model picks highest probability token EXPENSIVE
+                  "num_ctx": 8192 # model context window bump from default 2048
+                },
         }
         async with httpx.AsyncClient(timeout=REQUEST_TIMEOUT_SECONDS) as http_client:
             response = await http_client.post(self.chat_url, json=package)
