@@ -21,6 +21,7 @@ from mcp_client_console.terminal import (
     tool_text,
     thinking_icon,
     PROMPT_KEY,
+    WIDTH
 )
 
 
@@ -35,10 +36,10 @@ async def async_main(server: dict, config: dict):
         orchestrator = Orchestrator(session, config, tools)
         clear_terminal()
         print(welcome_banner())
-        print("_" * 50)
+        print("_" * WIDTH)
         print(header_text("[ CONNECTED SERVER ]"))
         print(f"\n{server['name']} @ {server['url']}\n")
-        print("_" * 50)
+        print("_" * WIDTH)
         print(header_text("[ AVAILABLE TOOLS ]"))
         for name, description, _ in tools: # "_" here is for the currently unused inputSchema attribute
             name_text = subheader_text(f"Name: {name}")
@@ -50,9 +51,10 @@ async def async_main(server: dict, config: dict):
 
 
         connection_status = True
+        print("_" * WIDTH)
+        print(model_text("\nHow may I help you today?"))
         while connection_status == True:
-            print("_" * 50)
-            print(model_text("\nHow may I help you today?"))
+            print("_" * WIDTH)
             user_input = input(f"\n{PROMPT_KEY} ").strip()
             if user_input.lower() == "quit" or user_input.lower() == "exit":
                 print(f"\nDisconnecting from {server['name']}...")
@@ -87,7 +89,7 @@ def main():
         except* httpx.ConnectError: # error handling (unique situation here since its for async process)
             print(error_text(f"\nCould not reach {server['name']} at {server['url']}.\n"))
             print(tool_text("Is the server running?\n"))
-            print("_" * 50)
+            print("_" * WIDTH)
             input(italic_text("\nPress Enter to return to server selection..."))
 
 
