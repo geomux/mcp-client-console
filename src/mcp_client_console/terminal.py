@@ -2,6 +2,9 @@
 # Terminal GUI and text handling kept neat and tidy here for import elsewhere
 
 import os
+import asyncio
+import itertools
+import sys
 
 ### ---------------
 ### --- CLI GUI ---
@@ -14,6 +17,8 @@ BOLD_BLUE = "\033[1;34m"
 BOLD_RED = "\033[1;31m"
 BRIGHT_MAGENTA = "\033[95m"
 DIM = "\033[2m"
+
+THINKING_FRAMES = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
 
 WIDTH = 50 # constant for max width of things in terminal
 
@@ -86,4 +91,10 @@ def welcome_banner() -> str:
     lines.append(f"{DIM}type 'quit' to disconnect{RESET}\n")
     return "\n".join(lines)
 
-
+async def thinking_icon(message: str):
+    """Prints a thinking animation status while waiting on the model."""
+    message_print = message or "thinking"
+    for frame in itertools.cycle(THINKING_FRAMES):
+        sys.stdout.write(f"\r{DIM}{frame} {message_print}...{RESET}")
+        sys.stdout.flush()
+        await asyncio.sleep(0.1)
