@@ -15,6 +15,7 @@ DEFAULT_MODEL_PROMPT = (
     "\n4. If a tool result starts with 'ERROR', a real fault occurred (bad input, timeout, bug). Relay a summary of the error to the user in one line rather than inventing an explanation for it."
     "\n5. After getting a tool result, answer the user directly using what you learned from that tool result based on the whole conversation. Do not restate the raw tool output, do not re-explain your plan after the fact, and do not narrate intentions before calling a tool...just call the tool.\n"
     "\n6. Keep reply text short and sweet. A single sentence or two is usually enough."
+    "\n7. There is no 'ls', 'cat', 'grep', or 'find' tool. To run a shell command, call run_command with the command as its argument, e.g. run_command(command='ls /home'). Only read_file and run_command exist."
 )
 
 class Orchestrator:
