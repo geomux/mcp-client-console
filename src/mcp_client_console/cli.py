@@ -3,45 +3,23 @@
 
 import asyncio
 import httpx
+import os
 from mcp_client_console.config_loader import config_load
 from mcp_client_console.config_loader import get_active_server
 from mcp_client_console.client import open_session
 from mcp_client_console.client import get_tools
 from mcp_client_console.client import run_tool
-
-### -------
-### CLI GUI
-### -------
-RESET = "\033[0m"
-BOLD_GREEN = "\033[1;32m"
-BOLD_BLUE = "\033[1;34m"
-BOLD_RED = "\033[1;31m"
-BRIGHT_MAGENTA = "\033[95m"
-DIM = "\033[2m"
+from mcp_client_console.terminal import (
+    clear_terminal,
+    header_text,
+    model_text,
+    subheader_text,
+    error_text,
+    tool_text,
+    PROMPT_KEY,
+)
 
 PROMPT_KEY = f"{BOLD_GREEN}>: {RESET}" # colorful UI settings for console chat prompt key.
-def header_text(text: str) -> str:
-    """Styles passed string to fancy header formatting"""
-    return f"{BOLD_BLUE}{text}{RESET}"
-
-def model_text(text: str) -> str:
-    """Styles passed string to fancy model text formatting"""
-    return f"\n{BRIGHT_MAGENTA}MODEL: {text}{RESET}"
-
-def subheader_text(text: str) -> str:
-    return f"{BOLD_GREEN}{text}{RESET}"
-
-def error_text(text: str) -> str:
-    """Styles passed string to fancy error text formatting"""
-    return f"\n{BOLD_RED}ERROR: {text}{RESET}"
-
-def tool_text(text: str) -> str:
-    """Styles text showing off a tool the model is running"""
-    return f"{DIM} -> {text}{RESET}"
-
-
-
-
 
 ### ----------
 ### MAIN LOGIC
@@ -51,6 +29,7 @@ def tool_text(text: str) -> str:
 async def async_main(server: dict):
     async with open_session(server["url"]) as session:
         tools = await get_tools(session)
+        clear_terminal()
         print(f"\n"*3)
         print(subheader_text("...session begin...hello..."))
         print(f"\n"*3)
@@ -86,6 +65,7 @@ async def async_main(server: dict):
                 reply = await orchestrator.run_turn(user_input, on_tool=show_tool)
                 print(model_text(reply))
             except httpx.ConnectError:
+                clear_terminal()
                 print(error_text("Cannot reach the model.\nIs the local Ollama server running or API key configured?"))
 
 
@@ -100,6 +80,7 @@ def main():
             print(subheader_text("\n...session over...goodbye...\n"))
             connection_status = False
         except* httpx.ConnectError: # error handling (unique situation here since its for async process)
+            clear_terminal()
             print("_" * 50)
             print(error_text(f"\nCould not reach {server['name']} at {server['url']}."))
             print("\nIs the server running?\n")
