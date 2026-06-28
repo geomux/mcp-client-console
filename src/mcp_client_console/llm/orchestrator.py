@@ -44,10 +44,11 @@ class Orchestrator:
     ### --- Externally Called Functions ---
     ### -----------------------------------
 
-    async def run_turn(self, user_input: str, on_tool=None) -> str:
+    async def run_turn(self, user_input: str, on_tool=None, confirm_tool=None) -> str:
         """Pass one user chat prompt, resolve any tool calls, return the tool result as model's final text.
         user_input: this argument passes the prompt from user.
         on_tool: this argument passes the tool chosen run (be switched on)
+        confirm_tool: this argument returns False to deny tool use
         """
         reply = await self.provider.user_message(user_input)
 
@@ -59,14 +60,19 @@ class Orchestrator:
 
             results = []
             for call in reply.tool_calls:
-                if on_tool:
-                    on_tool(call.name, call.arguments)
-                output = await self._run_one_tool(call)
+                if confirm_tool is not None and not confirm_tool(call.name, call.arguments):
+                    output = (
+                        "Tool acces denied by user. You are in chat-only mode for now. Answer without using tools and do not hallucinate pretending to use tools."
+                    )
+                else:
+                    if on_tool:
+                        on_tool(call.name, call.arguments)
+                    output = await self._run_one_tool(call)
                 results.append(ToolResult(call.call_id, call.name, output))
 
             reply = await self.provider.send_tool_results(results)
             steps += 1
-        return reply.text or "NOTE: the model had not text to return..."
+        return reply.text or "NOTE: the model had no text to return..."
 
     ### --------------------------------
     ### --- Interally Used Functions ---
