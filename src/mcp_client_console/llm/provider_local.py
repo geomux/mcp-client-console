@@ -60,7 +60,7 @@ class LocalProvider(Provider):
                 except json.JSONDecodeError:
                     arguments = {}
             name = function.get("name", "")
-            tool_calls.append(ToolCall(id=f"call_{index}_{name}", name=name, arguments=arguments))
+            tool_calls.append(ToolCall(call_id=f"call_{index}_{name}", name=name, arguments=arguments))
         text = message.get("content") or None
         return ProviderReply(text=text, tool_calls=tool_calls)
 
