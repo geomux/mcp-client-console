@@ -31,9 +31,7 @@ async def async_main(server: dict):
     async with open_session(server["url"]) as session:
         tools = await get_tools(session)
         clear_terminal()
-        print(f"\n"*3)
-        print(subheader_text("...session begin...hello..."))
-        print(f"\n"*3)
+        print(welcome_banner())
         print("_" * 50)
         print(header_text("[ CONNECTED SERVER ]"))
         print(f"\n{server['name']} @ {server['url']}\n")
@@ -41,8 +39,6 @@ async def async_main(server: dict):
         print(header_text("[ AVAILABLE TOOLS ]"))
         for name, description, _ in tools: # "_" here is for the currently unused inputSchema attribute
             print(f"\nName: {name}\nDescription:{description}")
-        print("_" * 50)
-        print(f"\nEnter 'quit' or 'exit' to disconnect from server at anytime.")
         print("\nType below to access remote MCP server with agentic model...")
 
         def show_tool(name, args):
@@ -77,7 +73,6 @@ def main():
         server = get_active_server(config_file)
         try:
             asyncio.run(async_main(server))
-            print(subheader_text("\n...session over...goodbye...\n"))
             connection_status = False
         except* httpx.ConnectError: # error handling (unique situation here since its for async process)
             print(error_text(f"\nCould not reach {server['name']} at {server['url']}.\n"))
