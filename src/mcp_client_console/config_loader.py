@@ -6,7 +6,7 @@ import tomllib
 from pathlib import Path
 from importlib.resources import files
 from platformdirs import user_config_dir
-from mcp_client_console.terminal import clear_terminal, welcome_banner, italic_text
+from mcp_client_console.terminal import clear_terminal, welcome_banner, italic_text, header_text
 
 APP_NAME = "mcp-client-console"
 
@@ -45,10 +45,10 @@ def config_create() -> Path:
         clear_terminal()
         print(welcome_banner())
         print("_"*50)
-        print("\n[ CONFIG CREATED ]")
+        print(header_text("\n[ CONFIG CREATED ]"))
         print("\nfilepath:")
-        print(f"\n{config_file}")
-        print(f"\nOpen config file, review and edit accordingly, save, and run the package again to begin.")
+        print(italic_text(f"\n{config_file}"))
+        print(f"\nOpen config file, review and edit accordingly, save, and run the package again to begin...")
         print("_"*50)
         print("\n")
         sys.exit(1)
