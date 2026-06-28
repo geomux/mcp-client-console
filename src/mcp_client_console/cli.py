@@ -38,8 +38,8 @@ async def async_main(server: dict):
         print("_" * 50)
         print(header_text("[ AVAILABLE TOOLS ]"))
         for name, description, _ in tools: # "_" here is for the currently unused inputSchema attribute
-            print(f"\nName: {name}\nDescription:{description}")
-        print("\nType below to access remote MCP server with agentic model...")
+            name_text = subheader_text(f"Name: {name}")
+            print(f"\n{name_text}\nDescription: {description}")
 
         def show_tool(name, args):
             """Show text from running tool to see model agent working"""
