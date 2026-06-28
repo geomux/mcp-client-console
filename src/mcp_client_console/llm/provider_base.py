@@ -55,7 +55,7 @@ class Provider(ABC):
         print(f"send_message called with: {text}")
 
     @abstractmethod
-    async def send_tool_result(self, result: list[ToolResult]) -> ProviderReply:
+    async def send_tool_results(self, result: list[ToolResult]) -> ProviderReply:
         """Append tool results, call the model again, return its reply"""
         print(f"send_tool_result called with: {result}")
 
