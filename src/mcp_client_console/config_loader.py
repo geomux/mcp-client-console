@@ -47,7 +47,7 @@ def config_create() -> Path:
         print("_"*50)
         print(header_text("\n[ CONFIG CREATED ]"))
         print("\nfilepath:")
-        print(italic_text(f"\n{config_file}"))
+        print(italic_text(f"{config_file}"))
         print(f"\nOpen config file, review and edit accordingly, save, and run the package again to begin...")
         print("_"*50)
         print("\n")
