@@ -19,6 +19,7 @@ from mcp_client_console.terminal import (
     subheader_text,
     error_text,
     tool_text,
+    thinking_icon,
     PROMPT_KEY,
 )
 
@@ -61,12 +62,17 @@ async def async_main(server: dict, config: dict):
                 continue
 
             try:
+                thinking_task_icon = asyncio.create_task(thinking_icon("thinking"))
                 reply = await orchestrator.run_turn(user_input, on_tool=show_tool)
+                thinking_task_icon.cancel()
+                print("\r" + " " * 20 + "\r", end="") # cleanup code for removing old icon frames
                 print(model_text(reply))
             except httpx.ConnectError:
+                thinking_task_icon.cancel()
+                print("\r" + " " * 20 + "\r", end="") # cleanup code for removing old icon frames
                 print(error_text("Cannot reach the model.\nIs the local Ollama server running or API key configured?"))
 
-        reply = await orchestrator.run_turn(user_input, on_tool=show_tool)
+        #reply = await orchestrator.run_turn(user_input, on_tool=show_tool)
 
 
 ### Sync'd logic | identifies config dictionary, gets the active server, runs async_main() to hold session with server
