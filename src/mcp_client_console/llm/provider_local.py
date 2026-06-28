@@ -9,7 +9,7 @@ from mcp_client_console.llm.provider_base import ProviderReply
 from mcp_client_console.llm.provider_base import ToolCall
 from mcp_client_console.llm.provider_base import ToolResult
 
-REQUEST_TIMEOUT_SECONDS = 300
+REQUEST_TIMEOUT_SECONDS = 600
 
 ### ----------------------------------
 ### --- MODEL PROVIDER LOCAL CLASS ---
