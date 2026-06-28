@@ -18,6 +18,7 @@ from mcp_client_console.terminal import (
     model_text,
     subheader_text,
     error_text,
+    authorize_text,
     tool_text,
     thinking_icon,
     PROMPT_KEY,
@@ -49,6 +50,23 @@ async def async_main(server: dict, config: dict):
             """Show text from running tool to see model agent working"""
             print(tool_text(f"running tool: {name}, {args}"))
 
+        tools_armed = False # session starts chat only until tools authorized
+
+        def authorize_tools(name, args):
+            """ Confirms authorization via user before tools may be run on the remote machine during this session."""
+            nonlocal tools_armed
+            if tools_armed:
+                return True
+            print("\r" + " " * WIDTH + "\r", end="", flush=True)
+            print(authorize_text(name, args))
+            answer = input(f"\n{PROMPT_KEY }").strip().lower()
+            if answer in ("y", "yes"):
+                tools_armed = True
+                print(tool_text(italic_text("Tool access granted for this session!")))
+                print(f"\nNOTE: tools may have root access to your entire system- SEVERE consequences may occur on personal computer.")
+                return True
+            print(tool_text(italic_text("DENIED: staying in chat only mode.")))
+            return False
 
         connection_status = True
         print("_" * WIDTH)
@@ -65,7 +83,11 @@ async def async_main(server: dict, config: dict):
 
             try:
                 thinking_task_icon = asyncio.create_task(thinking_icon("thinking"))
-                reply = await orchestrator.run_turn(user_input, on_tool=show_tool)
+                reply = await orchestrator.run_turn(
+                    user_input,
+                    on_tool = show_tool,
+                    confirm_tool = authorize_tools,
+                )
                 thinking_task_icon.cancel()
                 print("\r" + " " * 20 + "\r", end="") # cleanup code for removing old icon frames
                 print(model_text(reply))
@@ -74,7 +96,7 @@ async def async_main(server: dict, config: dict):
                 print("\r" + " " * 20 + "\r", end="") # cleanup code for removing old icon frames
                 print(error_text("Cannot reach the model.\nIs the local Ollama server running or API key configured?"))
 
-        reply = await orchestrator.run_turn(user_input, on_tool=show_tool)
+
 
 
 ### Sync'd logic | identifies config dictionary, gets the active server, runs async_main() to hold session with server
