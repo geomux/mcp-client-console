@@ -33,7 +33,6 @@ class Orchestrator:
         self.tool_names = tool_names
         self.provider = build_provider(config, tools, DEFAULT_MODEL_PROMPT)
 
-
     ### -----------------------------------
     ### --- Externally Called Functions ---
     ### -----------------------------------
