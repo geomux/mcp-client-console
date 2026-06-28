@@ -11,6 +11,8 @@ from mcp_client_console.client import get_tools
 from mcp_client_console.client import run_tool
 from mcp_client_console.terminal import (
     clear_terminal,
+    welcome_banner,
+    italic_text,
     header_text,
     model_text,
     subheader_text,
@@ -64,7 +66,6 @@ async def async_main(server: dict):
                 reply = await orchestrator.run_turn(user_input, on_tool=show_tool)
                 print(model_text(reply))
             except httpx.ConnectError:
-                clear_terminal()
                 print(error_text("Cannot reach the model.\nIs the local Ollama server running or API key configured?"))
 
 
@@ -75,15 +76,14 @@ def main():
     while connection_status == True:
         server = get_active_server(config_file)
         try:
-            asyncio.run(async_main(config_file, server))
+            asyncio.run(async_main(server))
             print(subheader_text("\n...session over...goodbye...\n"))
             connection_status = False
         except* httpx.ConnectError: # error handling (unique situation here since its for async process)
-            clear_terminal()
+            print(error_text(f"\nCould not reach {server['name']} at {server['url']}.\n"))
+            print(tool_text("Is the server running?\n"))
             print("_" * 50)
-            print(error_text(f"\nCould not reach {server['name']} at {server['url']}."))
-            print("\nIs the server running?\n")
-            print("_" * 50)
+            input(italic_text("\nPress Enter to return to server selection..."))
 
 
 if __name__ == "__main__":
