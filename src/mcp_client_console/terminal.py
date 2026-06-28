@@ -34,7 +34,7 @@ def header_text(text: str) -> str:
 
 def model_text(text: str) -> str:
     """Styles passed string to fancy model text formatting"""
-    return f"\n{BRIGHT_MAGENTA}MODEL: {text}{RESET}"
+    return f"{BRIGHT_MAGENTA}MODEL: {text}{RESET}"
 
 def subheader_text(text: str) -> str:
     return f"{BOLD_BLUE}{text}{RESET}"
