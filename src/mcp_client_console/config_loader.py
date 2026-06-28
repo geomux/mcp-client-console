@@ -6,7 +6,7 @@ import tomllib
 from pathlib import Path
 from importlib.resources import files
 from platformdirs import user_config_dir
-from mcp_client_console.terminal import clear_terminal
+from mcp_client_console.terminal import clear_terminal, welcome_banner, italic_text
 
 APP_NAME = "mcp-client-console"
 
@@ -43,12 +43,14 @@ def config_create() -> Path:
             # some programs save a BOM on the top of the file. BOM can be unexpected and cause crashes.
         config_file.chmod(0o600) # owner access only, security concerns as token lives in this file
         clear_terminal()
+        print(welcome_banner())
         print("_"*50)
         print("\n[ CONFIG CREATED ]")
         print("\nfilepath:")
         print(f"\n{config_file}")
         print(f"\nOpen config file, review and edit accordingly, save, and run the package again to begin.")
         print("_"*50)
+        print("\n")
         sys.exit(1)
     return config_file
 
@@ -67,20 +69,27 @@ def get_active_server(config_dictionary: dict) -> dict:
         server_choice = available_servers[0]
         return server_choice
 
+    error_message = ""
     still_choosing = True
     while still_choosing == True:
         clear_terminal()
+        print(welcome_banner())
+        print(italic_text("edit available servers anytime in user .config directory"))
         print("_" * 50)
         print(f"\n[ AVAILABLE SERVERS ]\n")
         for i, server in enumerate(available_servers, start=1):
             print(f"[ {i} ] {server['name']} @ {server['url']}")
         print("_" * 50)
+
+        if error_message:
+            print(error_text(error_message))
+
         print("\nTo connect to a server, enter number below... ")
         server_choice = input(f">: ").strip()
         print("_" * 50)
-        if server_choice.isdigit() == False:
-            clear_terminal()
-            print(error_text("\nEnter a server number listed above."))
+
+        if not server_choice.isdigit():
+            error_message = ("\nEnter a server number listed above.")
             continue
 
         server_number = int(server_choice) - 1 # because Python indexes start at 0
