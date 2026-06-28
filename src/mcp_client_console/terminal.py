@@ -94,7 +94,8 @@ def welcome_banner() -> str:
 async def thinking_icon(message: str):
     """Prints a thinking animation status while waiting on the model."""
     message_print = italic_text(message or "thinking")
+    print("\n")
     for frame in itertools.cycle(THINKING_FRAMES):
-        sys.stdout.write(f"\r{DIM}{frame} {message_print}...{RESET}")
+        sys.stdout.write(f"\r{BRIGHT_MAGENTA}{frame} {message_print}...{RESET}")
         sys.stdout.flush()
         await asyncio.sleep(0.1)
