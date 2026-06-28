@@ -49,7 +49,7 @@ def tool_text(text: str) -> str:
 
 def italic_text(text: str) -> str:
     """Styles passed string to a fancy italic formatting"""
-    return f"\n{ITALIC}{text}{RESET}"
+    return f"{ITALIC}{text}{RESET}"
 
 
 
@@ -93,7 +93,7 @@ def welcome_banner() -> str:
 
 async def thinking_icon(message: str):
     """Prints a thinking animation status while waiting on the model."""
-    message_print = message or "thinking"
+    message_print = italic_text(message or "thinking")
     for frame in itertools.cycle(THINKING_FRAMES):
         sys.stdout.write(f"\r{DIM}{frame} {message_print}...{RESET}")
         sys.stdout.flush()
