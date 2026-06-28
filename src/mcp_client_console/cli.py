@@ -63,7 +63,7 @@ async def async_main(server: dict, config: dict):
             if answer in ("y", "yes"):
                 tools_armed = True
                 print(tool_text(italic_text("Tool access granted for this session!")))
-                print(f"\nNOTE: tools may have root access to your entire system- SEVERE consequences may occur on personal computer.")
+                print(f"\nNOTE: tools may have root access to your entire system- CATASTROPHIC consequences may occur on personal computer.")
                 return True
             print(tool_text(italic_text("DENIED: staying in chat only mode.")))
             return False
