@@ -56,7 +56,7 @@ class Orchestrator:
                 if on_tool:
                     on_tool(call.name, call.arguments)
                 output = await self._run_one_tool(call)
-                results.append(ToolResult(call.id, call.name, output))
+                results.append(ToolResult(call.call_id, call.name, output))
 
             reply = await self.provider.send_tool_results(results)
             steps += 1
