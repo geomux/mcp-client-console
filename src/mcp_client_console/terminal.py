@@ -1,6 +1,7 @@
 # terminal.py
 # Terminal GUI and text handling kept neat and tidy here for import elsewhere
 
+import os
 
 ### ---------------
 ### --- CLI GUI ---
