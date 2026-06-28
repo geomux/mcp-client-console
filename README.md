@@ -91,7 +91,8 @@ If using a local LLM connection, review your config file to confirm the default 
 
 **Linux:**
     :~$ curl -fsSL https://ollama.com/install.sh | sh
-**macOS**
+    
+**macOS:**
     :~$ brew install ollama
     :~$ brew services start ollama
 
@@ -122,6 +123,10 @@ This should show your pulled model. If Ollama isn't running, start it with:
 
 **Windows:**
 Ollama runs automatically as a background service after install.
+
+### Confirm Local LLM within Ollama runs
+
+    :~$ ollama run llama3.1:8b
 
 ### Confirm the client can reach it
 
