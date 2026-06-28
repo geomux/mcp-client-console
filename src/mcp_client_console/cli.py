@@ -19,7 +19,6 @@ from mcp_client_console.terminal import (
     PROMPT_KEY,
 )
 
-PROMPT_KEY = f"{BOLD_GREEN}>: {RESET}" # colorful UI settings for console chat prompt key.
 
 ### ----------
 ### MAIN LOGIC
