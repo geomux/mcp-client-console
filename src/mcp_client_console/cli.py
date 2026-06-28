@@ -82,11 +82,11 @@ async def async_main(server: dict):
             if not user_input:
                 continue
 
-        try:
-            reply = await orchestrator.run_turn(user_input, on_tool=show_tool)
-            print(model_text(reply))
-        except: httpx.ConnectError
-            print(error_text("Cannot reach the model.\nIs the local Ollama server running or API key configured?"))
+            try:
+                reply = await orchestrator.run_turn(user_input, on_tool=show_tool)
+                print(model_text(reply))
+            except httpx.ConnectError:
+                print(error_text("Cannot reach the model.\nIs the local Ollama server running or API key configured?"))
 
 
 ### Sync'd logic | identifies config dictionary, gets the active server, runs async_main() to hold session with server
