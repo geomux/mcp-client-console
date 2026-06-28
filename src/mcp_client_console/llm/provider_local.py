@@ -76,7 +76,7 @@ class LocalProvider(Provider):
                 "tools": self.tools,
                 "stream": False,
                 "options": {
-                  "temperature": 0 # model picks highest probability token EXPENSIVE
+                  "temperature": 0, # model picks highest probability token EXPENSIVE
                   "num_ctx": 8192 # model context window bump from default 2048
                 },
         }
