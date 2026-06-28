@@ -28,7 +28,7 @@ MCP client that connects to a remote MCP server, LLM backend (API key or local m
     
 ## User Guide | Configuration
 
-**See client host LLM installation guide at the bottom of this README**
+**See local LLM installation guide at the bottom of this README**
 
 First run will create a default config.toml file and print the filepath to the config file.
 
