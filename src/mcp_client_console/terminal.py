@@ -7,6 +7,7 @@ import os
 ### --- CLI GUI ---
 ### ---------------
 
+ITALIC = "\033[3m"
 RESET = "\033[0m"
 BOLD_GREEN = "\033[1;32m"
 BOLD_BLUE = "\033[1;34m"
@@ -41,6 +42,9 @@ def tool_text(text: str) -> str:
     """Styles text showing off a tool the model is running"""
     return f"{DIM} -> {text}{RESET}"
 
+def italic_text(text: str) -> str:
+    """Styles passed string to a fancy italic formatting"""
+    return f"\n{ITALIC}{text}{RESET}"
 
 
 
@@ -79,7 +83,7 @@ def welcome_banner() -> str:
         _row(""),
         bottom,
     ]
-    lines.append(f"{DIM}type 'quit' or 'exit' to disconnect{RESET}\n")
+    lines.append(f"{DIM}type 'quit' to disconnect{RESET}\n")
     return "\n".join(lines)
 
 
