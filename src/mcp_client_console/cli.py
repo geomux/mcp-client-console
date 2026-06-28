@@ -52,7 +52,7 @@ async def async_main(server: dict, config: dict):
         connection_status = True
         while connection_status == True:
             print("_" * 50)
-            print(model_text("How may I help you today?"))
+            print(model_text("\nHow may I help you today?"))
             user_input = input(f"\n{PROMPT_KEY} ").strip()
             if user_input.lower() == "quit" or user_input.lower() == "exit":
                 print(f"\nDisconnecting from {server['name']}...")
@@ -72,7 +72,7 @@ async def async_main(server: dict, config: dict):
                 print("\r" + " " * 20 + "\r", end="") # cleanup code for removing old icon frames
                 print(error_text("Cannot reach the model.\nIs the local Ollama server running or API key configured?"))
 
-        #reply = await orchestrator.run_turn(user_input, on_tool=show_tool)
+        reply = await orchestrator.run_turn(user_input, on_tool=show_tool)
 
 
 ### Sync'd logic | identifies config dictionary, gets the active server, runs async_main() to hold session with server
