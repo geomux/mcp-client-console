@@ -6,6 +6,7 @@ import tomllib
 from pathlib import Path
 from importlib.resources import files
 from platformdirs import user_config_dir
+from mcp_client_console.terminal import clear_terminal
 
 APP_NAME = "mcp-client-console"
 
@@ -41,6 +42,7 @@ def config_create() -> Path:
             # this (encoding="utf-8-sig") argument to strip BOM (byte order mark) from config file if present.
             # some programs save a BOM on the top of the file. BOM can be unexpected and cause crashes.
         config_file.chmod(0o600) # owner access only, security concerns as token lives in this file
+        clear_terminal()
         print("_"*50)
         print("\n[ CONFIG CREATED ]")
         print("\nfilepath:")
@@ -67,6 +69,7 @@ def get_active_server(config_dictionary: dict) -> dict:
 
     still_choosing = True
     while still_choosing == True:
+        clear_terminal()
         print("_" * 50)
         print(f"\n[ AVAILABLE SERVERS ]\n")
         for i, server in enumerate(available_servers, start=1):
@@ -76,6 +79,7 @@ def get_active_server(config_dictionary: dict) -> dict:
         server_choice = input(f">: ").strip()
         print("_" * 50)
         if server_choice.isdigit() == False:
+            clear_terminal()
             print(error_text("\nEnter a server number listed above."))
             continue
 
