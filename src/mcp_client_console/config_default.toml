@@ -40,7 +40,7 @@ provider = "local"      # "local" or "api" (where your LLM is located)
 max_steps = 6           # max tool calls per message (save tokens/runaway loops)
 
 [llm.local]
-model = "llama3.1:8b"           # get your tag exactly as listed by command: ollama list
+model = "qwen2.5:14b"           # get your tag exactly as listed by command: ollama list
 host = "http://127.0.0.1:11434"  # where ollama server listens
 
 [llm.api]
