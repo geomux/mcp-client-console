@@ -47,7 +47,7 @@ async def async_main(server: dict, config: dict):
         print("_" * WIDTH)
         print(header_text("[ AVAILABLE TOOLS ]"))
         for name, description, _ in tools: # "_" here is for the currently unused inputSchema attribute
-            name_text = subheader_text(f"Name: {name}")
+            name_text = (f"Name: {subheader_text(name)}")
             print(f"\n{name_text}\nDescription: {description}")
 
         def show_tool(name, args):
