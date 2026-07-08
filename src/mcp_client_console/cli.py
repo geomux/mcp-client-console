@@ -41,6 +41,10 @@ async def async_main(server: dict, config: dict):
         print(header_text("[ CONNECTED SERVER ]"))
         print(f"\n{server['name']} @ {server['url']}\n")
         print("_" * WIDTH)
+        print(header_text("[ ACTIVE MODEL ]"))
+        llm = config["llm"]
+        print(f"\n{llm[llm['provider']]['model']} ({llm['provider']})\n")
+        print("_" * WIDTH)
         print(header_text("[ AVAILABLE TOOLS ]"))
         for name, description, _ in tools: # "_" here is for the currently unused inputSchema attribute
             name_text = subheader_text(f"Name: {name}")
