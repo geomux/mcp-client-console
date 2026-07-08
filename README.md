@@ -19,7 +19,7 @@ ollama pull qwen2.5:14b                         # default model in config_defaul
 ollama list                                     # confirm Ollama is running and the model is pulled
 ```
 
-To use a different model, pull it the same way and update `model` under `[llm.local]` in your `config.toml` to match the tag exactly. `host` under `[llm.local]` must include the full scheme: `http://127.0.0.1:11434` — not `127.0.0.1:11434`.
+To use a different model, pull it the same way and update `model` under `[llm.local]` in your `config.toml` to match the tag exactly. `host` under `[llm.local]` must include the full scheme: `http://127.0.0.1:11434`... not `127.0.0.1:11434`.
 
 ## User Guide | Installation
 
@@ -42,7 +42,7 @@ mcp-client-console
 
 ## User Guide | Configuration
 
-First run creates a default `config.toml` and prints its filepath (the `/config` command in the terminal chat prints it too). Edit it — populate with server name, url, token:
+First run creates a default `config.toml` and prints its filepath (the `/config` command in the terminal chat prints it too). Edit it... populate with server name, url, token:
 
 ```toml
 [server]
@@ -59,7 +59,7 @@ url = "http://127.0.0.1:9000/mcp"
 ## User Guide | Operation
 
 Start your MCP server first (see repos below) and confirm the client is configured to reach it. The client connects, performs the MCP handshake, and lists the server's tools. Use LLM natural language in the CLI to access tools on the remote box:
-
+<!--  -->
 ```
 $ mcp-client-console
 Connected to Box_1 @ http://127.0.0.1:9000/mcp
