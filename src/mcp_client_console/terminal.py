@@ -14,8 +14,10 @@ ITALIC = "\033[3m"
 RESET = "\033[0m"
 BOLD_GREEN = "\033[1;32m"
 BOLD_BLUE = "\033[1;34m"
+BOLD_CYAN = "\033[1;36m"
 BOLD_RED = "\033[1;31m"
 BRIGHT_MAGENTA = "\033[95m"
+BOLD_MAGENTA = "\033[1;35m"
 BOLD_YELLOW = "\033[1;33m"
 DIM = "\033[2m"
 
@@ -35,10 +37,10 @@ def header_text(text: str) -> str:
 
 def model_text(text: str) -> str:
     """Styles passed string to fancy model text formatting"""
-    return f"{BRIGHT_MAGENTA}MODEL: {text}{RESET}"
+    return f"{BOLD_MAGENTA}MODEL: {text}{RESET}"
 
 def subheader_text(text: str) -> str:
-    return f"{BOLD_BLUE}{text}{RESET}"
+    return f"{BOLD_CYAN}{text}{RESET}"
 
 def error_text(text: str) -> str:
     """Styles passed string to fancy error text formatting"""
