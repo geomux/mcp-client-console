@@ -44,7 +44,10 @@ model = "llama3.1:8b"           # get your tag exactly as listed by command: oll
 host = "http://127.0.0.1:11434"  # where ollama server listens
 
 [llm.api]
-model = "claude-mythos"         # any cloud model for which you have API key
+model = "claude-sonnet-5"              # any Anthropic model your API key can access
+api_key = "paste your Anthropic API key here"   # from console.anthropic.com - NOT your Pro/Max claude.ai login
+host = "https://api.anthropic.com"     # Anthropic Messages API endpoint (change only for a compatible proxy)
+max_tokens = 1024                      # max tokens per model reply
 
 
 
