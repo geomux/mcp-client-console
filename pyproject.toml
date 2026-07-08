@@ -11,7 +11,7 @@ packages = ["src/mcp_client_console"]
 # Config project stuff
 [project]
 name = "mcp-client-console"
-version = "0.2.1"
+version = "0.2.2"
 description = "MCP client that connects to a remote MCP server"
 readme = "README.md"
 license = "MIT"
