@@ -48,9 +48,8 @@ async def async_main(server: dict, config: dict):
         print(f"\n{llm[llm['provider']]['model']} ({llm['provider']})\n")
         print("_" * WIDTH)
         print(header_text("[ AVAILABLE TOOLS ]"))
-        for name, description, _ in tools: # "_" here is for the currently unused inputSchema attribute
-            name_text = (f"Name: {subheader_text(name)}")
-            print(f"\n{name_text}\nDescription: {description}")
+            summary = (description or "(no description)".strip().splitlines()[0])
+            print(f"\nName: {subheader_text(name)}\nDescription: {summary}")
 
         def show_tool(name, args):
             """Show text from running tool to see model agent working"""
@@ -83,6 +82,10 @@ async def async_main(server: dict, config: dict):
             if user_input.lower() == "quit" or user_input.lower() == "exit":
                 print(f"\nDisconnecting from {server['name']}...")
                 connection_status = False
+            if user_input.lower() == "tools":
+                for name, description, _ in tools: # "_" here is for the currently unused inputSchema attribute
+                    name_text = (f"Name: {subheader_text(name)}")
+                    print(f"\n{name_text}\nDescription: {description}")
                 continue
             if not user_input:
                 continue
