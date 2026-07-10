@@ -5,6 +5,7 @@ import asyncio
 import httpx
 import os
 from mcp_client_console.llm.orchestrator import Orchestrator
+from mcp_client_console._vendor.llm_shepard import attach # OPTIONAL: uses _vendor package to improve LLM tool handling by guiding prompts/tool responses.
 from mcp_client_console.config_loader import config_load
 from mcp_client_console.config_loader import get_active_server
 from mcp_client_console.client import open_session
@@ -35,6 +36,7 @@ async def async_main(server: dict, config: dict):
     async with open_session(server["url"]) as session:
         tools = await get_tools(session)
         orchestrator = Orchestrator(session, config, tools)
+        attach(orchestrator, config) # OPTIONAL: uses _vendor package to improve LLM tool handling by guiding prompts/tool responses.
         clear_terminal()
         print(welcome_banner())
         print("_" * WIDTH)
