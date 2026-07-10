@@ -99,7 +99,8 @@ def welcome_banner() -> str:
         _row(""),
         bottom,
     ]
-    lines.append(f"{DIM}type 'quit' to disconnect{RESET}\n")
+    lines.append(f"\n{DIM}type 'quit' to disconnect{RESET}\n")
+    lines.append(f"{DIM}type 'tools' for full tool descriptions{RESET}\n")
     return "\n".join(lines)
 
 async def thinking_icon(message: str):
