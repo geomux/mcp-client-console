@@ -48,7 +48,8 @@ async def async_main(server: dict, config: dict):
         print(f"\n{llm[llm['provider']]['model']} ({llm['provider']})\n")
         print("_" * WIDTH)
         print(header_text("[ AVAILABLE TOOLS ]"))
-            summary = (description or "(no description)".strip().splitlines()[0])
+        for name, description, _ in tools:
+            summary = (description or "(no description)").strip().splitlines()[0]
             print(f"\nName: {subheader_text(name)}\nDescription: {summary}")
 
         def show_tool(name, args):
