@@ -83,6 +83,7 @@ async def async_main(server: dict, config: dict):
             if user_input.lower() == "quit" or user_input.lower() == "exit":
                 print(f"\nDisconnecting from {server['name']}...")
                 connection_status = False
+                continue
             if user_input.lower() == "tools":
                 for name, description, _ in tools: # "_" here is for the currently unused inputSchema attribute
                     name_text = (f"Name: {subheader_text(name)}")
@@ -105,8 +106,19 @@ async def async_main(server: dict, config: dict):
                 thinking_task_icon.cancel()
                 print("\r" + " " * 20 + "\r", end="") # cleanup code for removing old icon frames
                 print(error_text("Cannot reach the model.\nIs the local Ollama server running or API key configured?"))
-
-
+            except httpx.TimeoutException:
+                thinking_task_icon.cancel()
+                print("\r" + " " * 20 + "\r", end="") # cleanup code for removing old icon frames
+                print(error_text(
+                    "Model timed out before finishing its reply.\n"
+                    "Still connected, ask again and raise REQUEST_TIMEOUT_SECONDS constant in provider_local.py if issue persists..."
+                    ))
+            except httpx.HTTPStatusError as error:
+                thinking_task_icon.cancel()
+                print("\r" + " " * 20 + "\r", end="") # cleanup code for removing old icon frames
+                print(error_text(
+                    f"Model endpoint returned HTTP {error.response.status_code}.\nCheck the model tag in config (command: ollama list) and that the endpoint is healthy."
+                    ))
 
 
 ### Sync'd logic | identifies config dictionary, gets the active server, runs async_main() to hold session with server
