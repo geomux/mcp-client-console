@@ -5,7 +5,7 @@ import asyncio
 import httpx
 import os
 from mcp_client_console.llm.orchestrator import Orchestrator
-from mcp_client_console._vendor.llm_shepard import attach # OPTIONAL: uses _vendor package to improve LLM tool handling by guiding prompts/tool responses.
+from mcp_client_console._vendor.llm_shepherd import attach # OPTIONAL: uses _vendor package to improve LLM tool handling by guiding prompts/tool responses.
 from mcp_client_console.config_loader import config_load
 from mcp_client_console.config_loader import get_active_server
 from mcp_client_console.client import open_session
