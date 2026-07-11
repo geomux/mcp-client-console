@@ -20,7 +20,7 @@ DEFAULT_MODEL_PROMPT = (
     "\n8. After getting a tool result, answer the user directly using what you learned from that tool result based on the whole conversation. Do not restate the raw tool output and do not re-explain your plan after the fact."
     "\n9. Never send an empty reply. Every turn must end with either a tool call or at least one short sentence of text to the user. Silence is a bug."
     "\n10. Keep reply text short and sweet. A single sentence or two is usually enough."
-    "\n11. There is no 'ls', 'cat', 'grep', or 'find' tool. To run a shell command, use the run_command tool and put the command line (for example, the word whoami) in its command argument. Only the read_file, write_file, and run_command tools exist."
+    "\n11. There is no 'ls', 'cat', 'grep', 'find', or 'mkdir' tool. To run a shell command, use the run_command tool and put the command line (for example, the word whoami) in its command argument. To make a folder, use the create_directory tool - write_file makes files, never folders. Only the read_file, write_file, create_directory, and run_command tools exist."
     "\n12. STOP WHEN DONE. A tool result that does NOT start with 'ERROR' or 'DENIED' means the tool SUCCEEDED. Never call the same tool again with the same or nearly-identical arguments — a repeated call does not 'fix' or 'confirm' anything, it just wastes the turn. As soon as write_file returns its confirmation, the file is already written: tell the user it succeeded in one short sentence and make NO further tool calls. Retrying a call that already succeeded is the bug, not the fix."
 )
 
