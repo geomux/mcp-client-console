@@ -101,6 +101,7 @@ def welcome_banner() -> str:
     ]
     lines.append(f"\n{DIM}type 'quit' to disconnect{RESET}\n")
     lines.append(f"{DIM}type 'tools' for full tool descriptions{RESET}\n")
+    lines.append(f"{DIM}type 'config' for path to configuration file{RESET}")
     return "\n".join(lines)
 
 async def thinking_icon(message: str):
