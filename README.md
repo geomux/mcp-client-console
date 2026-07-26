@@ -78,4 +78,5 @@ How may I help you today?
 - [x] Create MCP client repo
 - [x] Connect to MCP server locally
 - [x] LLM backend (API / local Ollama) added to client
-- [ ] Connect to MCP server remotely with TLS + bearer auth
+- [x] Connect to MCP server remotely (e.g. over the internet)
+- [ ] Add TLS + bearer auth as requirement
