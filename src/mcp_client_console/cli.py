@@ -6,7 +6,7 @@ import httpx
 import os
 from mcp_client_console.llm.orchestrator import Orchestrator
 from mcp_client_console._vendor.llm_shepherd import attach # OPTIONAL: uses _vendor package to improve LLM tool handling by guiding prompts/tool responses.
-from mcp_client_console.config_loader import config_load
+from mcp_client_console.config_loader import config_load, config_path
 from mcp_client_console.config_loader import get_active_server
 from mcp_client_console.client import open_session
 from mcp_client_console.client import get_tools
@@ -89,6 +89,9 @@ async def async_main(server: dict, config: dict):
                     name_text = (f"Name: {subheader_text(name)}")
                     print(f"\n{name_text}\nDescription: {description}")
                 continue
+            if user_input.lower() == 'config' or user_input.lower() == "configuration":
+                print(f"\nConfig file located at: {config_path()}\n")
+                print("Configure remote server(s) to access there...\n")
             if not user_input:
                 continue
 
