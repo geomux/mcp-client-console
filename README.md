@@ -71,7 +71,7 @@ How may I help you today?
 
 - [mcp-server-remote](https://github.com/geomux/mcp-server-remote)
 - [mcp-sandbox-setup](https://github.com/geomux/mcp-sandbox-setup)
-- [mcp-host-setup](https://github.com/geomux/mcp-host-setup)
+- [mcp-host-configuration](https://github.com/geomux/mcp-host-configuration)
 
 ## Project Status
 
