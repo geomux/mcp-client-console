@@ -79,4 +79,4 @@ How may I help you today?
 - [x] Connect to MCP server locally
 - [x] LLM backend (API / local Ollama) added to client
 - [x] Connect to MCP server remotely (e.g. over the internet)
-- [ ] Add TLS + bearer auth as requirement
+- [x] Add TLS + bearer auth as requirement
