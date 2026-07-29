@@ -33,7 +33,7 @@ from mcp_client_console.terminal import (
 
 ### Async'd logic | holds a session with the server and remote tool handling
 async def async_main(server: dict, config: dict):
-    async with open_session(server["url"]) as session:
+    async with open_session(server["url"], server.get("token")) as session:
         tools = await get_tools(session)
         orchestrator = Orchestrator(session, config, tools)
         attach(orchestrator, config) # OPTIONAL: uses _vendor package to improve LLM tool handling by guiding prompts/tool responses.
@@ -137,8 +137,28 @@ def main():
             print(error_text(f"\nCould not reach {server['name']} at {server['url']}.\n"))
             print(tool_text("Is the server running?\n"))
             print("_" * WIDTH)
+        except* httpx.HTTPStatusError as error_group:
+            status = error_group.exceptions[0].response.status_code
+            if status in (401, 403):
+                print(error_text(f"\n{server['name']} rejected the bearer token."))
+                print(tool_text(
+                    "Token mismatch. The [[server]] token in your client config must match\n"
+                    "the [auth] token in that machine's mcp-server-remote config.toml.\n"
+                ))
+                print(italic_text(f"Client config: {config_path()}\n"))
+            else:
+                print(error_text(f"\n{server['name']} returned HTTP {status}."))
+            print("_" * WIDTH)
             input(italic_text("\nPress Enter to return to server selection..."))
 
+        except* ssl.SSLError:
+            print(error_text(f"\nTLS handshake with {server['name']} failed."))
+            print(tool_text(
+                "The certificate could not be verified. If this host uses a self-signed\n"
+                "certificate, its CA must be trusted by this machine.\n"
+            ))
+            print("_" * WIDTH)
+            input(italic_text("\nPress Enter to return to server selection..."))
 
 if __name__ == "__main__":
     main()
