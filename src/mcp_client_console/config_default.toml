@@ -10,9 +10,11 @@
 
 
 # [[server]] EXAMPLE
-# name = "name of remote machine"
-# url = "address to remote machine server"
-# token = "bearer token for remote machine server"
+# name  = "name of remote machine"
+# url   = "https://box.example.com/mcp"   <-- use https:// for anything off this machine
+# token = "bearer token, must match [auth] token in that machine's server config"
+#
+# http:// is only acceptable for 127.0.0.1 on localhost.
 
 [[server]]
 name = "Box_1"
