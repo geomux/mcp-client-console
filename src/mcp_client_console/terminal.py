@@ -5,6 +5,7 @@ import os
 import asyncio
 import itertools
 import sys
+from mcp_client_console import __version__
 
 ### ---------------
 ### --- CLI GUI ---
@@ -91,17 +92,17 @@ def welcome_banner() -> str:
     """Returns a styled ASCII welcome banner for MCP-CLIENT-CONSOLE startup."""
     top = f"{BOLD_BLUE}╔{'═' * WIDTH}╗{RESET}"
     bottom = f"{BOLD_BLUE}╚{'═' * WIDTH}╝{RESET}"
-
     lines = [
         top,
         _row(""),
         _row("MCP-CLIENT-CONSOLE", color=BOLD_GREEN),
+        _row(f"v{__version__}", color=DIM)
         _row(""),
         bottom,
     ]
     lines.append(f"\n{DIM}type 'quit' to disconnect{RESET}\n")
     lines.append(f"{DIM}type 'tools' for full tool descriptions{RESET}\n")
-    lines.append(f"{DIM}type 'config' for path to configuration file{RESET}")
+    lines.append(f"{DIM}type 'config' for path to configuration file{RESET}\n")
     return "\n".join(lines)
 
 async def thinking_icon(message: str):
