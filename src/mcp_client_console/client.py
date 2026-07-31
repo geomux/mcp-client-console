@@ -11,7 +11,7 @@ from mcp.client.streamable_http import streamablehttp_client
 ### 2. ClientSession: handles MCP within HTTP stream packets
 @asynccontextmanager # @asynccontextmanager sticks MCP to HTTP both (plus the initialize server handshake)
 async def open_session(url: str, token: str | None = None): #returns ClientSession
-    headers = {"Authorization": f"Bearer {token}" if token else None} # bearer token assigned to headers in HTTP layer, on every request in the session
+    headers = {"Authorization": f"Bearer {token}"} if token else {} # bearer token assigned to headers in HTTP layer, on every request in the session
 
     async with streamablehttp_client(url, headers=headers) as (read_stream, write_stream, get_session_id): # HTTP layer
         async with ClientSession(read_stream, write_stream) as session: # MCP layer
