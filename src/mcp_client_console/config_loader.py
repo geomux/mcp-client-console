@@ -48,7 +48,7 @@ def config_create() -> Path:
         print(header_text("\n[ CONFIG CREATED ]"))
         print("\nfilepath:")
         print(italic_text(f"{config_file}"))
-        print(f"\nOpen config file, review and edit accordingly, save, and run the package again to begin...")
+        print(f"\n{header_text("Open config file,")} review and edit accordingly, save, and run the package again to begin...")
         print("_"*50)
         print("\n")
         sys.exit(1)
