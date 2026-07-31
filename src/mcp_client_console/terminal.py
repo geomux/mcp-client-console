@@ -96,7 +96,7 @@ def welcome_banner() -> str:
         top,
         _row(""),
         _row("MCP-CLIENT-CONSOLE", color=BOLD_GREEN),
-        _row(f"v{__version__}", color=DIM)
+        _row(f"v{__version__}", color=DIM),
         _row(""),
         bottom,
     ]
