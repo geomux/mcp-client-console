@@ -8,6 +8,10 @@
 > pulled from PyPI. It is stdlib-only, self-contained, inert until wired in, and touches
 > the host package only through its public `Provider` seam. All hand-written code in
 > this repository lives outside `_vendor/`.
+>
+> **Licensing:** this package was generated for this project and is distributed under
+> the repository's MIT license (see `LICENSE` at the repo root). "External" above
+> describes authorship, not a separate copyright holder.
 
 An **add-only** companion package to `llm/`. It wraps the LLM provider with a
 deterministic supervisor (the **Shepherd**) that sits invisibly between the
