@@ -63,6 +63,20 @@ def authorize_text(name: str, args) -> str:
         f"Allow tool access for this session? {BOLD_GREEN}[y/n]{RESET}"
     )
 
+def authorize_shell_text(name: str, args) -> str:
+    """Styles the per-call approval for an UNRESTRICTED tool that bypasses the server allowlist.
+
+    Louder than authorize_text on purpose, and it prints the command line on its own row:
+    this approval covers ONE call only, so the exact text being run is what must be read.
+    """
+    command = args.get("command", args) if isinstance(args, dict) else args
+    return (
+        f"{BOLD_RED}[ !! UNRESTRICTED COMMAND - APPROVE THIS ONE CALL !! ]{RESET}\n"
+        f"{BOLD_YELLOW}No allowlist and no path check applies to {name}.{RESET}\n"
+        f"\n    {BOLD_BLUE}{command}{RESET}\n\n"
+        f"Run this exact command on the remote machine? {BOLD_GREEN}[y/n]{RESET}"
+    )
+
 
 
 ### ----------------------
