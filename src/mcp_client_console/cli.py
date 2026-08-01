@@ -147,6 +147,7 @@ def main():
                     "the [auth] token in that machine's mcp-server-remote config.toml.\n"
                 ))
                 print(italic_text(f"Client config: {config_path()}\n"))
+                print(subheader_text("[ PLEASE RESTART THIS APPLICATION AFTER UPDATING CONFIG TOKEN ]"))
             else:
                 print(error_text(f"\n{server['name']} returned HTTP {status}."))
             print("_" * WIDTH)
