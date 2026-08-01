@@ -82,6 +82,7 @@ def get_active_server(config_dictionary: dict) -> dict:
         return server_choice
 
     error_message = ""
+    notice_message = "" # like error_message, held (not printed) so it survives the next clear_terminal()
     still_choosing = True
     while still_choosing == True:
         clear_terminal()
@@ -93,15 +94,47 @@ def get_active_server(config_dictionary: dict) -> dict:
             print(f"[ {i} ] {server['name']} @ {server['url']}")
         print("_" * 50)
 
+        if notice_message:
+            print(notice_message)
+
         if error_message:
             print(error_text(error_message))
 
         print("\nTo connect to a server, enter number below... ")
-        server_choice = input(f">: ").strip()
+        try:
+            server_choice = input(f">: ").strip()
+        except (KeyboardInterrupt, EOFError): # Ctrl+C / Ctrl+D at the menu leaves the app
+            server_choice = "quit"
         print("_" * 50)
 
+        ### the banner offers these commands, so they must answer here too - before any server is connected
+        if server_choice.lower() in ("quit", "exit"):
+            clear_terminal()
+            print(welcome_banner())
+            print(italic_text("\nGoodbye...\n"))
+            sys.exit(0)
+
+        if server_choice.lower() in ("config", "configuration"):
+            error_message = ""
+            notice_message = (
+                f"{header_text('[ CONFIG FILE ]')}\n\n"
+                f"{italic_text(str(config_path()))}\n\n"
+                "Add, remove, or re-address servers there, then run the package again..."
+            )
+            continue
+
+        if server_choice.lower() == "tools":
+            error_message = ""
+            notice_message = italic_text("\nTools belong to a server - connect to one first, then type 'tools'.")
+            continue
+
+        if not server_choice: # bare Enter is a no-op, leaves any notice on screen
+            continue
+
+        notice_message = "" # any real selection attempt clears an old notice
+
         if not server_choice.isdigit():
-            error_message = ("\nEnter a server number listed above.")
+            error_message = ("\nEnter a server number listed above, or type 'config' or 'quit'.")
             continue
 
         server_number = int(server_choice) - 1 # because Python indexes start at 0
