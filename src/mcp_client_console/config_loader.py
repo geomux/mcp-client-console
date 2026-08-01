@@ -3,10 +3,11 @@
 
 import sys
 import tomllib
-from pathlib import Path
 from importlib.resources import files
-from platformdirs import user_config_dir
 from mcp_client_console.terminal import clear_terminal, welcome_banner, italic_text, header_text
+from pathlib import Path
+from platformdirs import user_config_dir
+from urllib.parse import urlparse
 
 APP_NAME = "mcp-client-console"
 
@@ -67,6 +68,17 @@ def get_active_server(config_dictionary: dict) -> dict:
     available_servers = config_dictionary["server"]
     if len(available_servers) == 1:
         server_choice = available_servers[0]
+        problem = _url_problem(server_choice["url"]) # no menu to return to on this path, so a bad URL must stop here
+        if problem:
+            clear_terminal()
+            print(welcome_banner())
+            print("_" * 50)
+            print(error_text(problem))
+            print(italic_text(f"\nConfig file: {config_path()}\n"))
+            print("Fix the URL, save, and run the package again...")
+            print("_" * 50)
+            print("\n")
+            sys.exit(1)
         return server_choice
 
     error_message = ""
@@ -94,9 +106,26 @@ def get_active_server(config_dictionary: dict) -> dict:
 
         server_number = int(server_choice) - 1 # because Python indexes start at 0
         if server_number < 0 or server_number >= len(available_servers):
-            print(f"\nEnter a server number listed above.")
+            error_message = ("\nEnter a server number listed above.") # assigned (not printed) so it survives clear_terminal() on the next redraw
             continue
-        return available_servers[server_number]
+
+        server_choice = available_servers[server_number]
+        problem = _url_problem(server_choice["url"])
+        if problem:
+            error_message = problem
+            continue
+        return server_choice
+
+def _url_problem(url: str) -> str | None:
+    """
+        Automated catch if Config file's URL does not contain /mcp or https://
+    """
+    parts = urlparse(url)
+    if not parts.scheme or not parts.netloc:
+        return f"\n{url}\nis not a valid URL. Include http:// or https://"
+    if not parts.path.rstrip("/"):
+        return f"\n{url}\nis missing the server's mount path (e.g. /mcp)."
+
 
 if __name__ == "__main__":
     config = config_load()
