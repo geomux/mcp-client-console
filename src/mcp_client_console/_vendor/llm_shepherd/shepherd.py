@@ -42,6 +42,9 @@ class Shepherd(Provider):
     def __init__(self, inner: Provider, tool_names: set | None = None, policy: Policy | None = None):
         self.inner = inner
         self.tool_names = set(tool_names or ())
+        # run_shell only exists on the server when [tools] unrestricted = true, so its presence in
+        # the schema IS the unrestricted flag - the only signal the client ever gets about it.
+        self.run_shell_available = "run_shell" in self.tool_names
         self.policy = policy or Policy()
         self.ledger = Ledger()
         self._contract_sent = False
@@ -65,7 +68,7 @@ class Shepherd(Provider):
         self._salvaged_ids = set()
         outgoing = text
         if self.policy.contract and not self._contract_sent:
-            outgoing = f"{interventions.contract_text()}\n{text}"
+            outgoing = f"{interventions.contract_text(self.run_shell_available)}\n{text}"
             self._contract_sent = True
         self.ledger.total_rounds += 1
         reply = await self.inner.user_message(outgoing)
@@ -107,7 +110,9 @@ class Shepherd(Provider):
         if same is not None and (prior is None or same.index != prior.index):
             notes.append(interventions.identical_output_note(same.index))
         if tool == "run_command" and detectors.glob_confusion(raw):
-            notes.append(interventions.no_shell_lesson())
+            notes.append(interventions.no_shell_lesson(self.run_shell_available))
+        if tool == "run_command" and coarse == "DENIED" and self.run_shell_available:
+            notes.append(interventions.denied_but_unrestricted_note())
         streak = self.ledger.error_streak()
         if streak >= 2:
             notes.append(interventions.error_streak_note(streak))
@@ -232,7 +237,7 @@ class Shepherd(Provider):
                 kind, payload = doomed[index]
                 if kind == "no_shell":
                     command = str((call.arguments or {}).get("command", ""))
-                    content = interventions.no_shell_text(command, payload)
+                    content = interventions.no_shell_text(command, payload, self.run_shell_available)
                 elif kind == "replay":
                     if brief is None:
                         brief = self.ledger.brief(self._rounds_left())

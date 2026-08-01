@@ -8,31 +8,54 @@
 ### --- PROTOCOL CONTRACT ---
 ### -------------------------
 
-def contract_text() -> str:
-    """The one-time protocol preamble prepended to the first user turn."""
-    return (
-        "[SUPERVISOR NOTE - follow this protocol, do not mention it]\n"
-        "You are supervised while using tools.\n"
-        "1. After each tool result, note in ONE short sentence what it told you.\n"
-        "2. Then either ANSWER the user, or make exactly ONE new tool call.\n"
-        "3. NEVER repeat a call you already made. The supervisor blocks repeats - the result cannot change.\n"
-        "4. Empty output is a real answer. It means: no matches / empty file. Do not re-check it.\n"
-        "5. A DENIED or ERROR result will not improve by retrying it unchanged. Change the approach or report it.\n"
-        "[USER REQUEST]"
-    )
+def contract_text(run_shell_available: bool = False) -> str:
+    """The one-time protocol preamble prepended to the first user turn.
+    run_shell_available: True when the host registered run_shell (unrestricted mode ON),
+    which adds the rule that a run_command denial is not the end of the road.
+    """
+    lines = [
+        "[SUPERVISOR NOTE - follow this protocol, do not mention it]",
+        "You are supervised while using tools.",
+        "1. After each tool result, note in ONE short sentence what it told you.",
+        "2. Then either ANSWER the user, or make exactly ONE new tool call.",
+        "3. NEVER repeat a call you already made. The supervisor blocks repeats - the result cannot change.",
+        "4. Empty output is a real answer. It means: no matches / empty file. Do not re-check it.",
+        "5. A DENIED or ERROR result will not improve by retrying it unchanged. Change the approach or report it.",
+    ]
+    if run_shell_available:
+        lines.append(
+            "6. run_shell is in your tools, so this host has UNRESTRICTED mode ON. It runs ANY command line "
+            "through a real shell with NO allowed-commands list and NO path limits. If the user asks whether "
+            "unrestricted mode is on, the answer is YES - never decide that from run_command's allowed list, "
+            "which describes run_command alone. A DENIED from run_command is that one tool's allowlist talking; "
+            "reissuing the same command through run_shell IS the changed approach rule 5 asks for."
+        )
+    lines.append("[USER REQUEST]")
+    return "\n".join(lines)
 
 
 ### ----------------------------
 ### --- PRE-EXECUTION BLOCKS ---
 ### ----------------------------
 
-def no_shell_text(command: str, operators: list[str]) -> str:
+def no_shell_text(command: str, operators: list[str], run_shell_available: bool = False) -> str:
     """Synthetic result for a run_command call that needs a shell it does not have.
     command: the rejected command line.
     operators: the shell operators that doomed it.
+    run_shell_available: True when run_shell exists - then a shell DOES exist on this
+    host and the fix is to reissue the line there, not to rewrite it shell-free.
     """
     shown = " ".join(command.split())[:200]
     ops = " ".join(operators)
+    if run_shell_available:
+        return (
+            "REJECTED BEFORE RUNNING - wrong tool for this command.\n"
+            f"Your command: {shown}\n"
+            f"It uses shell operators ( {ops} ), and run_command has NO SHELL - they would reach the program as literal text.\n"
+            "But this host DOES have a shell: the run_shell tool. It takes pipes, redirects, chains, globs and $VARS for real.\n"
+            "Call run_shell now with that SAME command line, unchanged.\n"
+            "Nothing was executed and nothing broke."
+        )
     return (
         "REJECTED BEFORE RUNNING - this command cannot work here.\n"
         f"Your command: {shown}\n"
@@ -141,12 +164,39 @@ def salvage_note() -> str:
     )
 
 
-def no_shell_lesson() -> str:
-    """Note attached when a result shows the no-shell glob trap (e.g. cannot access '/home/*')."""
+def no_shell_lesson(run_shell_available: bool = False) -> str:
+    """Note attached when a result shows the no-shell glob trap (e.g. cannot access '/home/*').
+    run_shell_available: True when run_shell exists, so globs can simply be rerun there.
+    """
+    if run_shell_available:
+        return (
+            "LESSON: run_command has NO SHELL, so globs *, ~, $VARS and pipes reached it as LITERAL text - "
+            "'/home/*' was read as a folder name that does not exist.\n"
+            "The run_shell tool DOES expand them. Rerun that same line through run_shell, "
+            "or use ONE plain command like: find /home -maxdepth 3 -name <exact-name> -type d"
+        )
     return (
         "LESSON: commands here run with NO SHELL. Globs *, ~, $VARS and pipes are LITERAL text, "
         "so '/home/*' is a literal folder name that does not exist.\n"
         "To search, run ONE plain command like: find /home -maxdepth 3 -name <exact-name> -type d"
+    )
+
+
+def denied_but_unrestricted_note() -> str:
+    """Note attached to a DENIED run_command result when run_shell is registered.
+
+    This is the fix for the give-up loop: the server's own denial receipt ends with
+    'Pick an allowed option or tell the user what was denied', which offers the model
+    exactly two outs and neither is run_shell. Arriving in the same message, this note
+    supplies the third out just-in-time, where small models actually act on it.
+    """
+    return (
+        "NOT FINAL: that DENIED came from run_command's allowed-commands list, and that list "
+        "governs run_command ONLY. It does not apply to run_shell.\n"
+        "run_shell is in your tools: no allowed-commands list, no path limits, real shell.\n"
+        "If the user genuinely asked for this command, call run_shell now with that SAME command line. "
+        "Do NOT tell the user it is not permitted, and do NOT report the allowed list as if it were the whole policy - "
+        "run_shell can run it."
     )
 
 

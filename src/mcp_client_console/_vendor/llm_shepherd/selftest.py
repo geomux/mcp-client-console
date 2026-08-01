@@ -340,6 +340,72 @@ class TestRepeatsAndReplay(unittest.TestCase):
         self.assertIn("BLOCKED", fake.result_batches[1][0].content)
 
 
+### ------------------------------------
+### --- UNRESTRICTED / run_shell TESTS --
+### ------------------------------------
+
+UNRESTRICTED_TOOLS = TOOLS | {"run_shell"}
+
+
+class TestUnrestrictedRunShell(unittest.TestCase):
+    """Regression: a run_command denial made the model give up even though run_shell existed.
+
+    The server's denial receipt ends with 'Pick an allowed option or tell the user what was
+    denied' - two outs, neither being run_shell - so the model reported failure instead of
+    reissuing. The shepherd now supplies the third out in the same message.
+    """
+
+    def test_denied_run_command_points_at_run_shell_when_unrestricted(self):
+        fake = FakeInner([
+            reply_call("u1", "run_command", {"command": "useradd qwen"}),
+            reply_call("u2", "run_shell", {"command": "useradd qwen"}),  # the recovery
+            reply_text("Created the qwen user."),
+        ])
+        shepherd = Shepherd(fake, tool_names=UNRESTRICTED_TOOLS,
+                            policy=Policy(contract=False, visible_batch_limit=5))
+        asyncio.run(shepherd.user_message("make a user called qwen"))
+        denial = ("DENIED: 'useradd' is not allowed.\nAllowed: ls, cat, find\n"
+                  "Do not retry variations of the denied call. Pick an allowed option or tell the user what was denied.")
+        second = asyncio.run(shepherd.send_tool_results([ToolResult("u1", "run_command", denial)]))
+        noted = fake.result_batches[0][0].content
+        self.assertIn("NOT FINAL", noted)
+        self.assertIn("run_shell", noted)
+        # the same command line through run_shell is a DIFFERENT ledger key - never blocked as a repeat
+        self.assertTrue(second.wants_tools)
+        self.assertEqual(second.tool_calls[0].name, "run_shell")
+
+    def test_restricted_host_denial_gets_no_run_shell_advice(self):
+        fake = FakeInner([
+            reply_call("r1", "run_command", {"command": "useradd qwen"}),
+            reply_text("Not permitted here."),
+        ])
+        shepherd = Shepherd(fake, tool_names=TOOLS,  # no run_shell registered
+                            policy=Policy(contract=False, visible_batch_limit=5))
+        asyncio.run(shepherd.user_message("make a user called qwen"))
+        asyncio.run(shepherd.send_tool_results(
+            [ToolResult("r1", "run_command", "DENIED: 'useradd' is not allowed.")]
+        ))
+        self.assertNotIn("run_shell", fake.result_batches[0][0].content)
+
+    def test_contract_declares_unrestricted_mode_on(self):
+        fake = FakeInner([reply_text("Yes, unrestricted mode is on.")])
+        shepherd = Shepherd(fake, tool_names=UNRESTRICTED_TOOLS, policy=Policy(visible_batch_limit=5))
+        asyncio.run(shepherd.user_message("is unrestricted mode on?"))
+        self.assertIn("UNRESTRICTED mode ON", fake.user_messages[0])
+
+    def test_shell_operators_redirect_to_run_shell_instead_of_rewrite(self):
+        fake = FakeInner([
+            reply_call("s1", "run_command", {"command": "ls /home | grep qwen"}),
+            reply_text("Done."),
+        ])
+        shepherd = Shepherd(fake, tool_names=UNRESTRICTED_TOOLS,
+                            policy=Policy(contract=False, visible_batch_limit=5))
+        asyncio.run(shepherd.user_message("find qwen in home"))
+        rejected = fake.result_batches[0][0].content
+        self.assertIn("run_shell", rejected)
+        self.assertNotIn("commands on this host run with NO SHELL", rejected)
+
+
 ### --------------------------------
 ### --- SALVAGE-IN-THE-LOOP TEST ---
 ### --------------------------------
