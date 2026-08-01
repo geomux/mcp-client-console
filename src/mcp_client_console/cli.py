@@ -3,15 +3,14 @@
 
 import asyncio
 import httpx
-import os
 import ssl
+from contextlib import suppress
 from mcp_client_console.llm.orchestrator import Orchestrator
 from mcp_client_console._vendor.llm_shepherd import attach # OPTIONAL: uses _vendor package to improve LLM tool handling by guiding prompts/tool responses.
 from mcp_client_console.config_loader import config_load, config_path
 from mcp_client_console.config_loader import get_active_server
 from mcp_client_console.client import open_session
 from mcp_client_console.client import get_tools
-from mcp_client_console.client import run_tool
 from mcp_client_console.terminal import (
     clear_terminal,
     welcome_banner,
@@ -21,11 +20,17 @@ from mcp_client_console.terminal import (
     subheader_text,
     error_text,
     authorize_text,
+    authorize_shell_text,
     tool_text,
     thinking_icon,
     PROMPT_KEY,
     WIDTH
 )
+
+# Tools that bypass the server's allowed-commands list, so one session-wide 'yes' must never
+# cover them. Every call gets its own approval prompt. Matches run_shell in mcp-server-remote,
+# which the server registers only when [tools] unrestricted = true in its config.
+ALWAYS_ASK_TOOLS = {"run_shell"}
 
 
 ### ----------
@@ -62,11 +67,27 @@ async def async_main(server: dict, config: dict):
         def authorize_tools(name, args):
             """ Confirms authorization via user before tools may be run on the remote machine during this session."""
             nonlocal tools_armed
+            if name in ALWAYS_ASK_TOOLS:
+                # NEVER latches: an unrestricted shell tool is re-approved on EVERY call, because
+                # the one session-wide 'yes' below was granted for the allowlisted tools, not for this.
+                print("\r" + " " * WIDTH + "\r", end="", flush=True)
+                print(authorize_shell_text(name, args))
+                try:
+                    answer = input(f"\n{PROMPT_KEY}").strip().lower()
+                except (KeyboardInterrupt, EOFError): # Ctrl+C / Ctrl+D at an authorize prompt means "no"
+                    answer = "n"
+                if answer in ("y", "yes"):
+                    return True
+                print(tool_text(italic_text("DENIED: unrestricted command refused.")))
+                return False
             if tools_armed:
                 return True
             print("\r" + " " * WIDTH + "\r", end="", flush=True)
             print(authorize_text(name, args))
-            answer = input(f"\n{PROMPT_KEY }").strip().lower()
+            try:
+                answer = input(f"\n{PROMPT_KEY }").strip().lower()
+            except (KeyboardInterrupt, EOFError): # Ctrl+C / Ctrl+D at an authorize prompt means "no"
+                answer = "n"
             if answer in ("y", "yes"):
                 tools_armed = True
                 print(tool_text(italic_text("Tool access granted for this session!")))
@@ -75,12 +96,24 @@ async def async_main(server: dict, config: dict):
             print(tool_text(italic_text("DENIED: staying in chat only mode.")))
             return False
 
+        async def stop_thinking(task):
+            """Cancels the thinking animation and wipes its frame off the terminal line."""
+            task.cancel()
+            with suppress(asyncio.CancelledError):
+                await task
+            print("\r" + " " * WIDTH + "\r", end="", flush=True) # cleanup code for removing old icon frames
+
         connection_status = True
         print("_" * WIDTH)
         print(model_text("\nHow may I help you today?"))
         while connection_status == True:
             print("_" * WIDTH)
-            user_input = input(f"\n{PROMPT_KEY} ").strip()
+            try:
+                user_input = input(f"\n{PROMPT_KEY} ").strip()
+            except (KeyboardInterrupt, EOFError): # Ctrl+C / Ctrl+D at the chat prompt disconnects cleanly
+                print(f"\n\nDisconnecting from {server['name']}...")
+                connection_status = False
+                continue
             if user_input.lower() == "quit" or user_input.lower() == "exit":
                 print(f"\nDisconnecting from {server['name']}...")
                 connection_status = False
@@ -93,40 +126,50 @@ async def async_main(server: dict, config: dict):
             if user_input.lower() == 'config' or user_input.lower() == "configuration":
                 print(f"\nConfig file located at: {config_path()}\n")
                 print("Configure remote server(s) to access there...\n")
+                continue
             if not user_input:
                 continue
 
+            # message is built here (not printed) so the thinking icon can always be cleaned up first
+            thinking_task_icon = asyncio.create_task(thinking_icon("thinking"))
             try:
-                thinking_task_icon = asyncio.create_task(thinking_icon("thinking"))
                 reply = await orchestrator.run_turn(
                     user_input,
                     on_tool = show_tool,
                     confirm_tool = authorize_tools,
                 )
-                thinking_task_icon.cancel()
-                print("\r" + " " * 20 + "\r", end="") # cleanup code for removing old icon frames
-                print(model_text(reply))
+                message = model_text(reply)
             except httpx.ConnectError:
-                thinking_task_icon.cancel()
-                print("\r" + " " * 20 + "\r", end="") # cleanup code for removing old icon frames
-                print(error_text("Cannot reach the model.\nIs the local Ollama server running or API key configured?"))
+                message = error_text("Cannot reach the model.\nIs the local Ollama server running or API key configured?")
             except httpx.TimeoutException:
-                thinking_task_icon.cancel()
-                print("\r" + " " * 20 + "\r", end="") # cleanup code for removing old icon frames
-                print(error_text(
+                message = error_text(
                     "Model timed out before finishing its reply.\n"
                     "Still connected, ask again and raise REQUEST_TIMEOUT_SECONDS constant in provider_local.py if issue persists..."
-                    ))
+                    )
             except httpx.HTTPStatusError as error:
-                thinking_task_icon.cancel()
-                print("\r" + " " * 20 + "\r", end="") # cleanup code for removing old icon frames
-                print(error_text(
+                message = error_text(
                     f"Model endpoint returned HTTP {error.response.status_code}.\nCheck the model tag in config (command: ollama list) and that the endpoint is healthy."
-                    ))
+                    )
+            except Exception as error: # catch all so one bad turn never tears down the whole session
+                message = error_text(
+                    f"That turn failed: {type(error).__name__}: {error}\n"
+                    "Still connected, ask again..."
+                    )
+            finally:
+                await stop_thinking(thinking_task_icon)
+            print(message)
+
+
+### Digs the real exception out of an ExceptionGroup, which asyncio may nest a few levels deep
+def first_error(error_group: BaseExceptionGroup) -> BaseException:
+    error = error_group.exceptions[0]
+    while isinstance(error, BaseExceptionGroup):
+        error = error.exceptions[0]
+    return error
 
 
 ### Sync'd logic | identifies config dictionary, gets the active server, runs async_main() to hold session with server
-def main():
+def server_loop():
     config_file = config_load()
     connection_status = True
     while connection_status == True:
@@ -138,8 +181,17 @@ def main():
             print(error_text(f"\nCould not reach {server['name']} at {server['url']}.\n"))
             print(tool_text("Is the server running?\n"))
             print("_" * WIDTH)
+            input(italic_text("\nPress Enter to return to server selection..."))
+        except* httpx.TimeoutException: # NOTE: ConnectTimeout is NOT a ConnectError, it needs its own arm
+            print(error_text(f"\n{server['name']} at {server['url']} did not answer in time."))
+            print(tool_text(
+                "The host never replied. If this is a tunnel URL the tunnel may be stale,\n"
+                "restart it and update the URL in your config.\n"
+            ))
+            print("_" * WIDTH)
+            input(italic_text("\nPress Enter to return to server selection..."))
         except* httpx.HTTPStatusError as error_group:
-            status = error_group.exceptions[0].response.status_code
+            status = first_error(error_group).response.status_code
             if status in (401, 403):
                 print(error_text(f"\n{server['name']} rejected the bearer token."))
                 print(tool_text(
@@ -161,6 +213,20 @@ def main():
             ))
             print("_" * WIDTH)
             input(italic_text("\nPress Enter to return to server selection..."))
+
+        except* Exception as error_group: # last resort so no raw traceback ever reaches the user
+            error = first_error(error_group)
+            print(error_text(f"\nLost the session with {server['name']}."))
+            print(tool_text(f"{type(error).__name__}: {error}\n"))
+            print("_" * WIDTH)
+            input(italic_text("\nPress Enter to return to server selection..."))
+
+### Entry point named in pyproject.toml | keeps Ctrl+C from ever printing a traceback
+def main():
+    try:
+        server_loop()
+    except KeyboardInterrupt: # Ctrl+C while connecting or sitting at the server menu
+        print(italic_text("\n\nGoodbye...\n"))
 
 if __name__ == "__main__":
     main()
