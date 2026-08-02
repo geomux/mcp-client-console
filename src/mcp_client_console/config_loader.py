@@ -68,7 +68,7 @@ def get_active_server(config_dictionary: dict) -> dict:
     available_servers = config_dictionary["server"]
     if len(available_servers) == 1:
         server_choice = available_servers[0]
-        problem = _url_problem(server_choice["url"]) # no menu to return to on this path, so a bad URL must stop here
+        problem = _url_problem(server_choice) # no menu to return to on this path, so a bad URL must stop here
         if problem:
             clear_terminal()
             print(welcome_banner())
@@ -143,21 +143,28 @@ def get_active_server(config_dictionary: dict) -> dict:
             continue
 
         server_choice = available_servers[server_number]
-        problem = _url_problem(server_choice["url"])
+        problem = _url_problem(server_choice)
         if problem:
             error_message = problem
             continue
         return server_choice
 
-def _url_problem(url: str) -> str | None:
+def _url_problem(url: dict) -> str | None:
     """
         Automated catch if Config file's URL does not contain /mcp or https://
     """
+    url = server["url"]
     parts = urlparse(url)
     if not parts.scheme or not parts.netloc:
         return f"\n{url}\nis not a valid URL. Include http:// or https://"
     if not parts.path.rstrip("/"):
         return f"\n{url}\nis missing the server's mount path (e.g. /mcp)."
+    if parts.scheme ~= "https":
+        on_this_machine = parts.hostname in ("127.0.0.1", "localhost", "::1")
+        if not (on_this_machine or server.get("allow_insecure", False)):
+            return (
+                f"\n{url}\nwould send the bearer token unencrypted. Please use https:// or OVERRIDE by setting allow_insecure on this [[server]] settings in Config."
+            )
 
 
 if __name__ == "__main__":
