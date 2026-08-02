@@ -2,6 +2,8 @@
 # Speaks MCP (within Streamable HTTP packets) to a remote MCP server - opens a session, lists tools, runs tools.
 ### ...lots of notes below because complicated...
 
+import ssl
+import httx
 from contextlib import asynccontextmanager
 from mcp import ClientSession
 from mcp.client.streamable_http import streamablehttp_client
@@ -10,10 +12,22 @@ from mcp.client.streamable_http import streamablehttp_client
 ### 1. streamablehttp_client: handles HTTP read & write streams
 ### 2. ClientSession: handles MCP within HTTP stream packets
 @asynccontextmanager # @asynccontextmanager sticks MCP to HTTP both (plus the initialize server handshake)
-async def open_session(url: str, token: str | None = None): #returns ClientSession
+async def open_session(url: str, token: str | None = None, ca_cert: str | None = None): #returns ClientSession
     headers = {"Authorization": f"Bearer {token}"} if token else {} # bearer token assigned to headers in HTTP layer, on every request in the session
 
-    async with streamablehttp_client(url, headers=headers) as (read_stream, write_stream, get_session_id): # HTTP layer
+
+    def http_client_factory(headers=None, timeout=None, auth=None):
+        """
+            Build httpx client to trust self-signed cert (ca_cert).
+        """
+        verify = ssl.create_default_context(cafile=ca_cert) if ca_cert else True
+        return httpx.AsyncClient(
+            headers=headers, timeout=timeout, auth=auth, follow_redirects=True, verify=verify,
+        )
+
+    async with streamablehttp_client(
+        url, headers=headers, httpx_client_factory=http_client_factory,
+    ) as (read_stream, write_stream, get_session_id): # HTTP layer
         async with ClientSession(read_stream, write_stream) as session: # MCP layer
             await session.initialize() # IMPORTANT: MCP handshake here - protocol version + capabilities set
             yield session
