@@ -149,7 +149,7 @@ def get_active_server(config_dictionary: dict) -> dict:
             continue
         return server_choice
 
-def _url_problem(url: dict) -> str | None:
+def _url_problem(server: dict) -> str | None:
     """
         Automated catch if Config file's URL does not contain /mcp or https://
     """
@@ -159,7 +159,7 @@ def _url_problem(url: dict) -> str | None:
         return f"\n{url}\nis not a valid URL. Include http:// or https://"
     if not parts.path.rstrip("/"):
         return f"\n{url}\nis missing the server's mount path (e.g. /mcp)."
-    if parts.scheme ~= "https":
+    if parts.scheme != "https":
         on_this_machine = parts.hostname in ("127.0.0.1", "localhost", "::1")
         if not (on_this_machine or server.get("allow_insecure", False)):
             return (
