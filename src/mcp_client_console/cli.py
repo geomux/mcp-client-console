@@ -39,7 +39,7 @@ ALWAYS_ASK_TOOLS = {"run_shell"}
 
 ### Async'd logic | holds a session with the server and remote tool handling
 async def async_main(server: dict, config: dict):
-    async with open_session(server["url"], server.get("token"), server.get(ca_cert)) as session:
+    async with open_session(server["url"], server.get("token"), server.get("ca_cert")) as session:
         tools = await get_tools(session)
         orchestrator = Orchestrator(session, config, tools)
         attach(orchestrator, config) # OPTIONAL: uses _vendor package to improve LLM tool handling by guiding prompts/tool responses.
