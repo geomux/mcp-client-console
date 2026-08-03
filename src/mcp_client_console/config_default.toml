@@ -8,35 +8,28 @@
 # --- SERVER SETTINGS ---
 #------------------------
 
-
-# [[server]] EXAMPLE
-# name  = "name of remote machine"
-# url   = "https://box.example.com/mcp"   <-- use https:// for anything off this machine
-# token = "bearer token, must match [auth] token in that machine's server config"
-# ca_cert = "path/to/mcp.crt"  <-- ONLY for self-signed certs. Omit for Let's Encrypt / Cloudflare
-# allow_insecure = false  <-- ONLY to allow plain http:// off-machine. Local dev, never a real host.
-
 #NOTE http:// is only acceptable for 127.0.0.1 or localhost.
 
 [[server]]
 name = "Box_1"
-url = "http://127.0.0.1:9000/mcp"
-token = "paste your token here"
-# ca_cert = "path/to/mcp.crt"   # remove comment once path setup
-allow_insecure = false
+url = "https://127.0.0.1:9000/mcp"  # USE https:// for anything off this machine
+token = "paste your token here"     # MUST match [auth] token in that machine's server config"
+# ca_cert = 'path/to/mcp.crt'       # NOTE uncomment ONLY for self-signed certs
+                                    # NOTE USE single quotes only for the path. (i.e. ' = good. " = bad.)
+allow_insecure = false              # ONLY to allow plain http:// off-machine. Local dev, never a real host.
 
 [[server]]
 name = "Box_2"
-url = "http://127.0.0.1:9001/mcp"
+url = "https://127.0.0.1:9001/mcp"
 token = "paste your token here"
-# ca_cert = "path/to/mcp.crt"   # remove comment once path setup
+# ca_cert = 'path/to/mcp.crt'
 allow_insecure = false
 
 [[server]]
 name = "Box_3"
-url = "http://127.0.0.1:9002/mcp"
+url = "https://127.0.0.1:9002/mcp"
 token = "paste your token here"
-# ca_cert = "path/to/mcp.crt"   # remove comment once path setup
+# ca_cert = 'path/to/mcp.crt'
 allow_insecure = false
 
 ### Add additional [[server]] names and urls as needed.
