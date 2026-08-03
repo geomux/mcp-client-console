@@ -27,9 +27,10 @@ from mcp_client_console.terminal import (
     WIDTH
 )
 
-# Tools that bypass the server's allowed-commands list, so one session-wide 'yes' must never
-# cover them. Every call gets its own approval prompt. Matches run_shell in mcp-server-remote,
-# which the server registers only when [tools] unrestricted = true in its config.
+# Tools that bypass the server's allowed-commands list. These are re-approved on EVERY call
+# and are NOT covered by the session-wide 'yes' granted for allowlisted tools. The only way to
+# stop the per-call prompt is the explicit UNRESTRICTED opt-in below. Matches run_shell in
+# mcp-server-remote, which the server registers only when [tools] unrestricted = true.
 ALWAYS_ASK_TOOLS = {"run_shell"}
 
 
@@ -63,20 +64,28 @@ async def async_main(server: dict, config: dict):
             print(tool_text(f"running tool: {name}, {args}"))
 
         tools_armed = False # session starts chat only until tools authorized
+        shell_armed = False # session starts chat only until shell access authorized
 
         def authorize_tools(name, args):
             """ Confirms authorization via user before tools may be run on the remote machine during this session."""
-            nonlocal tools_armed
+            nonlocal tools_armed, shell_armed
             if name in ALWAYS_ASK_TOOLS:
-                # NEVER latches: an unrestricted shell tool is re-approved on EVERY call, because
-                # the one session-wide 'yes' below was granted for the allowlisted tools, not for this.
+                # Per-call approval by default: the session-wide 'yes' below covers allowlisted
+                # tools only, never this. Typing UNRESTRICTED at the prompt is the one way to
+                # latch it off, and that grant lasts until this session ends.
+                if shell_armed:
+                    return True
                 print("\r" + " " * WIDTH + "\r", end="", flush=True)
                 print(authorize_shell_text(name, args))
                 try:
-                    answer = input(f"\n{PROMPT_KEY}").strip().lower()
+                    raw = input(f"\n{PROMPT_KEY}").strip()     # keep the case
                 except (KeyboardInterrupt, EOFError): # Ctrl+C / Ctrl+D at an authorize prompt means "no"
-                    answer = "n"
-                if answer in ("y", "yes"):
+                    raw = "n"
+                if raw == "UNRESTRICTED":                       # exact, case-sensitive
+                    shell_armed = True
+                    print(tool_text(italic_text("UNRESTRICTED MODE: every shell command auto-approved for this session.")))
+                    return True
+                if raw.lower() in ("y", "yes"):
                     return True
                 print(tool_text(italic_text("DENIED: unrestricted command refused.")))
                 return False
