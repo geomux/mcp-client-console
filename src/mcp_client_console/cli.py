@@ -3,6 +3,7 @@
 
 import asyncio
 import httpx
+import signal
 import ssl
 from contextlib import suppress
 from mcp_client_console.llm.orchestrator import Orchestrator
@@ -79,7 +80,7 @@ async def async_main(server: dict, config: dict):
                 print(authorize_shell_text(name, args))
                 try:
                     raw = input(f"\n{PROMPT_KEY}").strip()     # keep the case
-                except (KeyboardInterrupt, EOFError): # Ctrl+C / Ctrl+D at an authorize prompt means "no"
+                except (KeyboardInterrupt, EOFError): # Ctrl+D at an authorize prompt means "no"
                     raw = "n"
                 if raw == "UNRESTRICTED":                       # exact, case-sensitive
                     shell_armed = True
@@ -95,7 +96,7 @@ async def async_main(server: dict, config: dict):
             print(authorize_text(name, args))
             try:
                 answer = input(f"\n{PROMPT_KEY }").strip().lower()
-            except (KeyboardInterrupt, EOFError): # Ctrl+C / Ctrl+D at an authorize prompt means "no"
+            except (KeyboardInterrupt, EOFError): # Ctrl+D at an authorize prompt means "no"
                 answer = "n"
             if answer in ("y", "yes"):
                 tools_armed = True
@@ -112,6 +113,19 @@ async def async_main(server: dict, config: dict):
                 await task
             print("\r" + " " * WIDTH + "\r", end="", flush=True) # cleanup code for removing old icon frames
 
+        ### ---------------------------------------------
+        ### SIGINT ("signal interrupt" Ctrl + C) handling
+        ### ---------------------------------------------
+        turn_task = None
+        provider = getattr(orchestrator.provider, "inner", orchestrator.provider)
+
+        def on_sigint(signum, frame):
+            if turn_task is not None and not turn_task.done():
+                turn_task.cancel()
+            else:
+                print(italic_text("\n[Ctrl+C ignored - type 'quit' to exit]"))
+        signal.signal(signal.SIGINT, on_sigint)
+
         connection_status = True
         print("_" * WIDTH)
         print(model_text("\nHow may I help you today?"))
@@ -119,7 +133,7 @@ async def async_main(server: dict, config: dict):
             print("_" * WIDTH)
             try:
                 user_input = input(f"\n{PROMPT_KEY} ").strip()
-            except (KeyboardInterrupt, EOFError): # Ctrl+C / Ctrl+D at the chat prompt disconnects cleanly
+            except (KeyboardInterrupt, EOFError): # Ctrl+D at the chat prompt disconnects cleanly
                 print(f"\n\nDisconnecting from {server['name']}...")
                 connection_status = False
                 continue
@@ -141,13 +155,15 @@ async def async_main(server: dict, config: dict):
 
             # message is built here (not printed) so the thinking icon can always be cleaned up first
             thinking_task_icon = asyncio.create_task(thinking_icon("thinking"))
+
+            mark = len(provider.messages)
+            turn_task = asyncio.create_task(orchestrator.run_turn(user_input, on_tool=show_tool, confirm_tool=authorize_tools,))
             try:
-                reply = await orchestrator.run_turn(
-                    user_input,
-                    on_tool = show_tool,
-                    confirm_tool = authorize_tools,
-                )
+                reply = await turn_task
                 message = model_text(reply)
+            except asyncio.CancelledError:
+                del provider.messages[mark:]
+                message = error_text("\n...Interrupted. Ask again...")
             except httpx.ConnectError:
                 message = error_text("Cannot reach the model.\nIs the local Ollama server running or API key configured?")
             except httpx.TimeoutException:
@@ -167,6 +183,7 @@ async def async_main(server: dict, config: dict):
             finally:
                 await stop_thinking(thinking_task_icon)
             print(message)
+        signal.signal(signal.SIGINT, signal.default_int_handler)
 
 
 ### Digs the real exception out of an ExceptionGroup, which asyncio may nest a few levels deep
